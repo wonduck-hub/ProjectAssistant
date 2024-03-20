@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectAssistant", "ProjectAssistant\ProjectAssistant.csproj", "{C73EF124-E3F6-47A4-A1B8-299D0313B6A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectAssistant", "ProjectAssistant\ProjectAssistant.csproj", "{C73EF124-E3F6-47A4-A1B8-299D0313B6A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectAssitant.Models", "ProjectAssitant.Models\ProjectAssitant.Models.csproj", "{D416D7B2-65A3-4C4F-B631-901DCCF084EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectAssistant.Models", "ProjectAssitant.Models\ProjectAssistant.Models.csproj", "{D416D7B2-65A3-4C4F-B631-901DCCF084EC}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database", "Database\Database.sqlproj", "{7D400B62-7933-424A-80AE-685F49001280}"
 EndProject
