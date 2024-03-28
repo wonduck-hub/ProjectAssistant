@@ -11,6 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProjectAssistant1.Areas.Identity;
 using ProjectAssistant1.Data;
+using ProjectAssistant1.Models;
+using ProjectAssistant1.Models.UserModel;
+using ProjectAssistant1.Models.UserWorkspacesModel;
+using ProjectAssistant1.Models.WorkspaceModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +45,16 @@ namespace ProjectAssistant1
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
+
+            // new DbContext
+            services.AddEntityFrameworkSqlServer().AddDbContext<ProjectAssistantDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")));
+
+            // DI Container에 서비스 등록
+            services.AddTransient<IWorkspaceRepositoryAsync, WorkspaceRepository>();
+            services.AddTransient<IUserWorkspaceRepositoryAsync, UserWorkspaceRepository>();
+            services.AddTransient<IUserRepositoryAsync, UserRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

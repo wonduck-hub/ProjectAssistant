@@ -1,43 +1,89 @@
 ﻿@page "/Workspaces"
 
-<h1>Select Workspace</h1>
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IWorkspaceRepositoryAsync WorkspaceRepository
+@inject NavigationManager NavigationManager
+
+<h1>Your workspaces</h1>
 <div class="top-row px-4 auth">
-    <button class="btn btn-outline-primary">Add Workspace</button>
+    <button type="button" class="btn btn-primary" @onclick="@ShowDialogButton">Add Workspace</button>
 </div>
 
 <br />
 
-<div class="container">
+
+<div class="container" style="height:500px; overflow-y: scroll;">
     <table class="table">
         <thead>
             <tr>
                 <th>Project Name</th>
                 <th>Create Date</th>
-                <th> </th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>John</td>
-                <td>1</td>
-                <td><button class="btn btn-outline-primary">test</button></td>
-            </tr>
-            <tr>
-                <td>Mary</td>
-                <td>Moe</td>
-            </tr>
-            <tr>
-                <td>July</td>
-                <td>Dooley</td>
-            </tr>
+            @foreach(var w in workspaces)
+            {
+                <tr>
+                    <td>@w.Name</td>
+                    <td>@w.Created</td>
+                </tr>
+            }
+            
         </tbody>
     </table>
 </div>
 
 <hr />
 
-
-
+@if (isShowDialog) {
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add workspace</h5>
+                </div>
+                <div class="modal-body">
+                    Project name:
+                    <input type="text" @bind="@newWorkspace.Name"/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @onclick="SaveWorkspace">Add</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseDialogButton">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
 @code {
+    private ClaimsPrincipal User => (AuthenticationStateProvider.GetAuthenticationStateAsync().Result).User;
 
+    private bool isShowDialog = false;
+
+    private List<Workspace> workspaces = new List<Workspace>();
+
+    private Workspace newWorkspace = new Workspace();
+
+    protected override async Task OnInitializedAsync()
+    {
+        workspaces = await WorkspaceRepository.GetWorkspacesAsync();
+    }
+
+    private void ShowDialogButton() {
+        isShowDialog = true;
+    }
+
+    private void CloseDialogButton() {
+        newWorkspace = new Workspace();
+        isShowDialog = false;
+    }
+
+    private async Task SaveWorkspace() {
+        newWorkspace.Created = DateTimeOffset.Now;
+        await WorkspaceRepository.AddWorkspaceAsync(newWorkspace);
+        newWorkspace = new Workspace();
+        isShowDialog = false;
+
+        NavigationManager.NavigateTo("/Workspaces", true); // TODO: 다음에 리로딩말고 다시 그리는 방법으로 수정
+    }
 }

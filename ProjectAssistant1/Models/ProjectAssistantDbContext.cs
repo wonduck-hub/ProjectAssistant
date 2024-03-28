@@ -1,25 +1,21 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
-using ProjectAssistant1.Models.UserModel;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using ProjectAssistant1.Data;
 using System.Configuration;
-using System.Text;
 
+using ProjectAssistant1.Models.UserModel;
+using ProjectAssistant1.Models.WorkspaceModel;
+using ProjectAssistant1.Models.UserWorkspacesModel;
 
-namespace ProjectAssistant1.Data
+namespace ProjectAssistant1.Models
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ProjectAssistantDbContext : DbContext
     {
-        public ApplicationDbContext()
+        public ProjectAssistantDbContext()
         {
 
         }
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ProjectAssistantDbContext(DbContextOptions<ProjectAssistantDbContext> options)
             : base(options)
         {
             // 공식과 같은 코드
@@ -37,8 +33,10 @@ namespace ProjectAssistant1.Data
             }
         }
 
+        public DbSet<User> AspNetUsers { get; set; }
+
+        public DbSet<Workspace> Workspaces { get; set; }
+
+        //public DbSet<UserWorkspace> UserWorkspaces { get; set; }
     }
-
-    
-
 }
