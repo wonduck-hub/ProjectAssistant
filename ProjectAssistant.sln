@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectAssistant1", "ProjectAssistant1\ProjectAssistant1.csproj", "{4929A5BE-7899-4FCD-8485-9CBD93B8525B}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SqlServer", "SqlServer\SqlServer.sqlproj", "{6ECAB00A-9763-4031-8F63-CD1217FD2580}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,12 @@ Global
 		{4929A5BE-7899-4FCD-8485-9CBD93B8525B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4929A5BE-7899-4FCD-8485-9CBD93B8525B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4929A5BE-7899-4FCD-8485-9CBD93B8525B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ECAB00A-9763-4031-8F63-CD1217FD2580}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ECAB00A-9763-4031-8F63-CD1217FD2580}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ECAB00A-9763-4031-8F63-CD1217FD2580}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{6ECAB00A-9763-4031-8F63-CD1217FD2580}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ECAB00A-9763-4031-8F63-CD1217FD2580}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ECAB00A-9763-4031-8F63-CD1217FD2580}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
