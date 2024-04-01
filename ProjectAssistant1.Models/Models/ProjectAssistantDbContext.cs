@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProjectAssistant1.Data;
 using System.Configuration;
 
 using ProjectAssistant1.Models.UserModel;

@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿
+
+using Microsoft.EntityFrameworkCore;
 
 namespace ProjectAssistant1.Models.UserModel
 {

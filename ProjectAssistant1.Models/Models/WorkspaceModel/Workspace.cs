@@ -7,8 +7,8 @@ namespace ProjectAssistant1.Models.WorkspaceModel
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public string CreateUserId { get; set; }
-        public string ModifiedUserId { get; set; }
+        public string? CreateUserId { get; set; }
+        public string? ModifiedUserId { get; set; }
 
         public DateTimeOffset? Created { get; set; }
         public DateTimeOffset? Modified { get; set; }
