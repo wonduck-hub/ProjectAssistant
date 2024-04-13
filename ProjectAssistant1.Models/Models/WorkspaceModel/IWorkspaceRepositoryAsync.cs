@@ -8,6 +8,7 @@ namespace ProjectAssistant1.Models.WorkspaceModel
         Task<Workspace> AddWorkspaceAsync(Workspace workspace);
         Task<List<Workspace>> GetWorkspacesAsync();
         Task<Workspace> GetWorkspaceByIdAsync(int id);
+        Task<List<Workspace>> GetWorkspaceByCreateUserId(string userId);
         Task<Workspace> UpdateWorkspaceAsync(Workspace workspace);
         Task RemoveWorkspaceAsync(int id);
     }

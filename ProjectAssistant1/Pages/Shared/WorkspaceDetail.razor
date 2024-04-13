@@ -1,0 +1,28 @@
+﻿@page "/WorkspaceDetail/{workspaceId:int}"
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IWorkspaceRepositoryAsync WorkspaceRepository
+@inject NavigationManager NavigationManager
+
+<h3>@workspace.Name</h3>
+
+<hr />
+
+
+
+@code {
+    [Parameter]
+    public int workspaceId { get; set; }
+
+    public Workspace workspace;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // AuthenticationStateProvider.GetAuthenticationStateAsync() 메서드는
+        // 현재 인증 상태를 나타내는 AuthenticationState 객체를 비동기적으로 반환하는 메서드다.
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        workspace = await WorkspaceRepository.GetWorkspaceByIdAsync(workspaceId);
+    }
+}

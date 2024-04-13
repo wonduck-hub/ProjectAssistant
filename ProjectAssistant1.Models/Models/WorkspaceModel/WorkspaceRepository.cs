@@ -22,6 +22,11 @@ namespace ProjectAssistant1.Models.WorkspaceModel
             return workspace;
         }
 
+        public async Task<List<Workspace>> GetWorkspaceByCreateUserId(string userId)
+        {
+            return await _context.Workspaces.Where(w => w.CreateUserId == userId).ToListAsync();
+        }
+
         public async Task<Workspace> GetWorkspaceByIdAsync(int id)
         {
             return await _context.Workspaces.FindAsync(id);

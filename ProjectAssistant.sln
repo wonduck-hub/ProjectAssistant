@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectAssistant1", "Projec
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SqlServer", "SqlServer\SqlServer.sqlproj", "{6ECAB00A-9763-4031-8F63-CD1217FD2580}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectAssistant1.Models", "ProjectAssistant1.Models\ProjectAssistant1.Models.csproj", "{FD5592DD-6308-4CD5-8A3F-1BDEFB171955}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectAssistant1.Models", "ProjectAssistant1.Models\ProjectAssistant1.Models.csproj", "{FD5592DD-6308-4CD5-8A3F-1BDEFB171955}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

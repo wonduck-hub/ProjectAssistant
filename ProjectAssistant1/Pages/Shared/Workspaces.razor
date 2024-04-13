@@ -24,7 +24,7 @@
             @foreach(var w in workspaces)
             {
                 <tr>
-                    <td>@w.Name</td>
+                    <td><a href="/WorkspaceDetail/@w.Id">@w.Name</a></td>
                     <td>@w.Created</td>
                 </tr>
             }
@@ -54,6 +54,8 @@
         </div>
     </div>
     <div class="modal-backdrop show"></div>
+
+
 }
 @code {
     private ClaimsPrincipal User => (AuthenticationStateProvider.GetAuthenticationStateAsync().Result).User;
@@ -66,7 +68,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        workspaces = await WorkspaceRepository.GetWorkspacesAsync();
+        // AuthenticationStateProvider.GetAuthenticationStateAsync() 메서드는
+        // 현재 인증 상태를 나타내는 AuthenticationState 객체를 비동기적으로 반환하는 메서드다.
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        workspaces = await WorkspaceRepository.GetWorkspaceByCreateUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
     }
 
     private void ShowDialogButton() {
@@ -79,8 +86,17 @@
     }
 
     private async Task SaveWorkspace() {
+        // AuthenticationStateProvider.GetAuthenticationStateAsync() 메서드는 
+        // 현재 인증 상태를 나타내는 AuthenticationState 객체를 비동기적으로 반환하는 메서드다.
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
         newWorkspace.Created = DateTimeOffset.Now;
+        // nameidentifier claim을 찾아 그 값을 CreateUserId에 대입하는 코드
+        newWorkspace.CreateUserId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
         await WorkspaceRepository.AddWorkspaceAsync(newWorkspace);
+
         newWorkspace = new Workspace();
         isShowDialog = false;
 
