@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProjectAssistant1.Models.UserWorkspacesModel
 {
@@ -12,9 +13,12 @@ namespace ProjectAssistant1.Models.UserWorkspacesModel
             this._context = context;
         }
 
-        public Task<UserWorkspace> AddUserWorkspaceAsync(UserWorkspace r)
+        public async Task<UserWorkspace> AddUserWorkspaceAsync(UserWorkspace r)
         {
-            throw new System.NotImplementedException();
+            _context.UserWorkspaces.Add(r);
+            await _context.SaveChangesAsync();
+
+            return r;
         }
 
         public Task<List<UserWorkspace>> GetUserWorkspacesByUserIdAsync()

@@ -4,7 +4,14 @@
 @inject IWorkspaceRepositoryAsync WorkspaceRepository
 @inject NavigationManager NavigationManager
 
-<h3>@workspace.Name</h3>
+@if(workspace == null)
+{
+    <h3>Error</h3>
+}
+else
+{
+    <h3>@workspace.Name</h3>
+}
 
 <hr />
 
@@ -16,13 +23,20 @@
 
     public Workspace workspace;
 
+
+    AuthenticationState authState;
+    ClaimsPrincipal user;
+
     protected override async Task OnInitializedAsync()
     {
         // AuthenticationStateProvider.GetAuthenticationStateAsync() 메서드는
         // 현재 인증 상태를 나타내는 AuthenticationState 객체를 비동기적으로 반환하는 메서드다.
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+    }
 
+    protected override async Task OnParametersSetAsync()
+    {
         workspace = await WorkspaceRepository.GetWorkspaceByIdAsync(workspaceId);
     }
 }

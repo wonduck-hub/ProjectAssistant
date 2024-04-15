@@ -4,6 +4,8 @@ using System.Configuration;
 using ProjectAssistant1.Models.UserModel;
 using ProjectAssistant1.Models.WorkspaceModel;
 using ProjectAssistant1.Models.UserWorkspacesModel;
+using ProjectAssistant1.Models.Models.WorkspaceUserModel;
+using ProjectAssistant1.Models.Models.ListModel;
 
 namespace ProjectAssistant1.Models
 {
@@ -36,6 +38,10 @@ namespace ProjectAssistant1.Models
 
         public DbSet<Workspace> Workspaces { get; set; }
 
-        //public DbSet<UserWorkspace> UserWorkspaces { get; set; }
+        public DbSet<UserWorkspace> UserWorkspaces { get; set; }
+
+        public DbSet<WorkspaceUser> WorkspaceUser { get; set; }
+
+        public DbSet<WorkList> Lists { get; set; }
     }
 }

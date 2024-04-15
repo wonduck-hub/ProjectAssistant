@@ -157,5 +157,10 @@
     </Build>
     <Build Include="dbo\Tables\Workspaces.sql" />
     <Build Include="dbo\Tables\UserWorkspaces.sql" />
+    <Build Include="dbo\Tables\Tasks.sql" />
+    <Build Include="dbo\Tables\ListWorkspace.sql" />
+    <Build Include="dbo\Tables\UserTask.sql" />
+    <Build Include="dbo\Tables\Lists.sql" />
+    <Build Include="dbo\Tables\WorkspaceUser.sql" />
   </ItemGroup>
 </Project>

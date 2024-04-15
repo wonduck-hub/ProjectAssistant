@@ -2,6 +2,7 @@
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IWorkspaceRepositoryAsync WorkspaceRepository
+@inject IWorkspaceUserRepository WorkspaceUserRepository
 @inject NavigationManager NavigationManager
 
 <h1>Your workspaces</h1>
@@ -21,14 +22,19 @@
             </tr>
         </thead>
         <tbody>
-            @foreach(var w in workspaces)
+            @if(workspaces == null)
             {
-                <tr>
-                    <td><a href="/WorkspaceDetail/@w.Id">@w.Name</a></td>
-                    <td>@w.Created</td>
-                </tr>
+                <div>새로운 작업공간을 추가하시오.</div>
             }
-            
+            else {
+                @foreach(var w in workspaces)
+                {
+                    <tr>
+                        <td><a href="/WorkspaceDetail/@w.Id">@w.Name</a></td>
+                        <td>@w.Created</td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
 </div>
@@ -54,8 +60,6 @@
         </div>
     </div>
     <div class="modal-backdrop show"></div>
-
-
 }
 @code {
     private ClaimsPrincipal User => (AuthenticationStateProvider.GetAuthenticationStateAsync().Result).User;
@@ -72,8 +76,22 @@
         // 현재 인증 상태를 나타내는 AuthenticationState 객체를 비동기적으로 반환하는 메서드다.
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
+        
+        // 관계에서 가져옴
+        var tempWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByUserIdAsync(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
 
-        workspaces = await WorkspaceRepository.GetWorkspaceByCreateUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+        if(tempWorkspaceUsers.Count == 0)
+        {
+            workspaces = null;
+        }
+        else
+        {
+            foreach(var item in tempWorkspaceUsers)
+            {
+                var temp = await WorkspaceRepository.GetWorkspaceByIdAsync(item.WorkspaceId);
+                workspaces.Add(temp);
+            }
+        }
     }
 
     private void ShowDialogButton() {
@@ -96,6 +114,10 @@
         newWorkspace.CreateUserId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
         await WorkspaceRepository.AddWorkspaceAsync(newWorkspace);
+
+        WorkspaceUser newUserWorkspace = new WorkspaceUser(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, newWorkspace.Id);
+
+        await WorkspaceUserRepository.AddWorkspaceUserAsync(newUserWorkspace);
 
         newWorkspace = new Workspace();
         isShowDialog = false;
