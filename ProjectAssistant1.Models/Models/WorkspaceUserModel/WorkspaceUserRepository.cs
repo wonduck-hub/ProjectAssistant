@@ -42,7 +42,7 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
             throw new NotImplementedException();
         }
 
-        public Task RemoveWorkspaceUserAsync(string userId, int workspaceId)
+        public Work RemoveWorkspaceUserAsync(string userId, int workspaceId)
         {
             throw new NotImplementedException();
         }

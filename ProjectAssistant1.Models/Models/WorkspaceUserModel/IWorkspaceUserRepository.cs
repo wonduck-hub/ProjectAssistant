@@ -14,6 +14,6 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
         Task<List<WorkspaceUser>> GetWorkspaceUserByUserIdAsync(string userId);
         Task<List<WorkspaceUser>> GetWorkspaceUserByWorkspaceIdAsync();
         Task<WorkspaceUser> UpdateWorkspaceUserAsync(WorkspaceUser r);
-        Task RemoveWorkspaceUserAsync(string userId, int workspaceId);
+        Work RemoveWorkspaceUserAsync(string userId, int workspaceId);
     }
 }

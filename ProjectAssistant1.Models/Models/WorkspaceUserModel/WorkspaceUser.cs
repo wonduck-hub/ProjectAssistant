@@ -11,9 +11,9 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
     {
         public WorkspaceUser() { }
 
-        public WorkspaceUser(string userId, int workspaceId)
+        public WorkspaceUser(string UserId, int workspaceId)
         {
-            AspNetUsersId = userId;
+            AspNetUsersId = UserId;
             WorkspaceId = workspaceId;
         }
 

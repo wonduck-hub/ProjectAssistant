@@ -15,6 +15,16 @@ else
 
 <hr />
 
+<div class="dropdown">
+    <button>드롭다운 메뉴</button>
+    <div class="dropdown-content">
+        <ul>
+            <li><a href="#">링크 1</a></li>
+            <li><a href="#">링크 2</a></li>
+            <li><a href="#">링크 3</a></li>
+        </ul>
+    </div>
+</div>
 
 
 @code {
@@ -33,10 +43,8 @@ else
         // 현재 인증 상태를 나타내는 AuthenticationState 객체를 비동기적으로 반환하는 메서드다.
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         user = authState.User;
-    }
 
-    protected override async Task OnParametersSetAsync()
-    {
         workspace = await WorkspaceRepository.GetWorkspaceByIdAsync(workspaceId);
     }
+
 }

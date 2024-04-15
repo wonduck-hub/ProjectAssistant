@@ -13,6 +13,6 @@ namespace ProjectAssistant1.Models.Models.ListModel
         Task<List<WorkList>> GetWorkListByUserIdAsync();
         Task<List<WorkList>> GetWorkListByWorkspaceIdAsync();
         Task<WorkList> UpdateWorkListAsync(WorkList r);
-        Task RemoveWorkListAsync(string userId, int workspaceId);
+        Work RemoveWorkListAsync(string userId, int workspaceId);
     }
 }

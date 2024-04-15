@@ -12,7 +12,7 @@ namespace ProjectAssistant1.Models.Models.ListModel
 
         public WorkListRepository(ProjectAssistantDbContext context)
         {
-            this._context = context;
+            _context = context;
         }
 
         public async Task<WorkList> AddWorkListAsync(WorkList r)
@@ -33,7 +33,7 @@ namespace ProjectAssistant1.Models.Models.ListModel
             throw new NotImplementedException();
         }
 
-        public Task RemoveWorkListAsync(string userId, int workspaceId)
+        public Work RemoveWorkListAsync(string userId, int workspaceId)
         {
             throw new NotImplementedException();
         }
