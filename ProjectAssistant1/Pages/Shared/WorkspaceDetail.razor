@@ -5,8 +5,9 @@
 
 @inject IWorkspaceRepositoryAsync WorkspaceRepository
 @inject IWorkListRepository WorkListRepository
+@inject IWorkRepository WorkRepository
 
-@if(workspace == null)
+@if (workspace == null)
 {
     <h1>Error</h1>
 }
@@ -19,33 +20,38 @@ else
     <button type="button" class="btn btn-primary" @onclick="@ShowAddCategoryDialogButton">Add new category</button>
 </div>
 
-@if(workLists == null)
+@if (workListDic == null)
 {
     <h4>카테고리가 없습니다.</h4>
 }
 else
 {
-    foreach(var item in workLists)
+    foreach (var item in workListDic)
     {
         <div class="container">
             <section class="mx-auto my-5">
                 <div class="card">
                     <div class="card-body">
-                        <div class="card-title font-weight-bold">@item.Name</div>
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <td><a>Work</a></td>
-                                </tr>
-                                <tr>
-                                    <td><a>Work</a></td>
-                                </tr>
-                                <tr>
-                                    <td><a>Work</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <input type="button" class="btn btn-primary" value="Add task" />
+                        <div class="card-title font-weight-bold">@item.Key.Name</div>
+                        
+                            @if (item.Value == null)
+                            {
+                                <div>작업이 없습니다.</div>
+                            }
+                            else
+                            {
+                                <table class="table">
+                                    <tbody>
+                                        @foreach(var v in item.Value)
+                                        {
+                                            <tr>
+                                                <td>@v.Name</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        <input type="button" class="btn btn-primary" value="Add task" @onclick="@( () => ShowAddWorkDialogButton(item.Key) )" />
                     </div>
                 </div>
             </section>
@@ -59,15 +65,40 @@ else
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add category</h5>
+                    <h5 class="modal-title">Add new category</h5>
                 </div>
                 <div class="modal-body">
                     Category name:
                     <input type="text" @bind="@newWorkList.Name" />
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" @onclick="AddWorksList">Add</button>
+                    <button type="button" class="btn btn-primary" @onclick="AddWorkList">Add</button>
                     <button type="button" class="btn btn-secondary" @onclick="CloseAddCategoryDialogButton">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
+
+@if (isShowAddWorkDialog)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add new work</h5>
+                </div>
+                <div class="modal-body">
+                    Work name:
+                    <input type="text" @bind="newWork.Name" />
+                    <br />
+                    Work detail:<br />
+                    <textarea @bind="newWork.TaskDetails" rows="5" cols="35" placeholder="Detail..." style="resize:none;"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @onclick="AddWorks">Add</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseAddWorkDialogButton">Close</button>
                 </div>
             </div>
         </div>
@@ -84,9 +115,15 @@ else
 
     private bool isShowAddCategoryDialog = false;
 
+    private bool isShowAddWorkDialog = false;
+
     private WorkList newWorkList = new WorkList();
 
-    private List<WorkList> workLists = new List<WorkList>();
+    private Work newWork = new Work();
+
+    private WorkList selectedWorkList = new WorkList();
+
+    private Dictionary<WorkList, List<Work>> workListDic = new Dictionary<WorkList, List<Work>>();
 
     AuthenticationState authState;
     ClaimsPrincipal user;
@@ -100,13 +137,21 @@ else
 
         workspace = await WorkspaceRepository.GetWorkspaceByIdAsync(WorkspaceId);
 
-        await ReloadWorkList();
+        await ReloadWorkListDic();
     }
 
-    private async Task ReloadWorkList()
+    private async Task ReloadWorkListDic()
     {
-        workLists = new List<WorkList>();
-        workLists = await WorkListRepository.GetWorkListsByWorkspaceIdAsync(workspace.Id);
+        workListDic = new Dictionary<WorkList, List<Work>>();
+
+        List<WorkList> tempWorkLists = new List<WorkList>();
+        tempWorkLists = await WorkListRepository.GetWorkListsByWorkspaceIdAsync(workspace.Id);
+
+        foreach (var item in tempWorkLists)
+        {
+            List<Work> tempWorks = await WorkRepository.GetWorkByListIdAsync(item.Id);
+            workListDic.Add(item, tempWorks);
+        }
     }
 
     private void ShowAddCategoryDialogButton()
@@ -120,7 +165,7 @@ else
         isShowAddCategoryDialog = false;
     }
 
-    private async Task AddWorksList(MouseEventArgs e)
+    private async Task AddWorkList(MouseEventArgs e)
     {
 
         newWorkList.Created = DateTimeOffset.Now;
@@ -133,6 +178,31 @@ else
         newWorkList = new WorkList();
         isShowAddCategoryDialog = false;
 
-        await ReloadWorkList();
+        await ReloadWorkListDic();
+    }
+    private async Task AddWorks()
+    {
+        newWork.Created = DateTimeOffset.Now;
+        newWork.CreateUserId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        newWork.ListId = selectedWorkList.Id;
+
+        await WorkRepository.AddWorkAsync(newWork);
+
+        newWork = new Work();
+        isShowAddWorkDialog = false;
+
+        await ReloadWorkListDic();
+    }
+
+    private void ShowAddWorkDialogButton(WorkList WorkList)
+    {
+        selectedWorkList = WorkList;
+        isShowAddWorkDialog = true;
+    }
+
+    private void CloseAddWorkDialogButton()
+    {
+        newWork = new Work();
+        isShowAddWorkDialog = false;
     }
 }

@@ -9,10 +9,10 @@ namespace ProjectAssistant1.Models.Models
 {
     public interface IWorkRepository
     {
-        Task<Work> AddUserAsync(Work task);
-        Task<List<Work>> GetUsersAsync();
-        Task<Work> GetUserByIdAsync(string id);
-        Task<Work> UpdateUserAsync(Work task);
-        Work RemoveUserAsync(string id);
+        Task<Work> AddWorkAsync(Work task);
+        Task<List<Work>> GetWorksAsync();
+        Task<List<Work>> GetWorkByListIdAsync(int listId);
+        Task<Work> UpdateWorkAsync(Work task);
+        Work RemoveWorkAsync(int id);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,27 +16,35 @@ namespace ProjectAssistant1.Models.Models
             _context = context;
         }
 
-        public Task<Work> AddUserAsync(Work task)
+        public async Task<Work> AddWorkAsync(Work task)
+        {
+            _context.Works.Add(task);
+            await _context.SaveChangesAsync();
+
+            return task;
+        }
+
+        public async Task<List<Work>> GetWorkByListIdAsync(int listId)
+        {
+            if (listId == null)
+            {
+                throw new ArgumentException("workspace Id cannot be null or empty.");
+            }
+
+            return await _context.Works.Where(wu => wu.ListId == listId).ToListAsync();
+        }
+
+        public Task<List<Work>> GetWorksAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<Work> GetUserByIdAsync(string id)
+        public Work RemoveWorkAsync(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<Work>> GetUsersAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Work RemoveUserAsync(string id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Work> UpdateUserAsync(Work task)
+        public Task<Work> UpdateWorkAsync(Work task)
         {
             throw new NotImplementedException();
         }
