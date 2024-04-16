@@ -13,7 +13,7 @@
 <br />
 
 
-<div class="container" style="height:500px; overflow-y: scroll;">
+<div class="container">
     <table class="table">
         <thead>
             <tr>
@@ -53,8 +53,8 @@
                     <input type="text" @bind="@newWorkspace.Name"/>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" @onclick="SaveWorkspace">Add</button>
-                    <button type="button" class="btn btn-secondary" @onclick="CloseDialogButton">Close</button>
+                    <input type="button" class="btn btn-primary" @onclick="SaveWorkspace" value="Add">
+                    <input type="button" class="btn btn-secondary" @onclick="CloseDialogButton" value="Close">
                 </div>
             </div>
         </div>
@@ -70,28 +70,17 @@
 
     private Workspace newWorkspace = new Workspace();
 
+    AuthenticationState authState;
+    ClaimsPrincipal user;
+
     protected override async Task OnInitializedAsync()
     {
         // AuthenticationStateProvider.GetAuthenticationStateAsync() 메서드는
         // 현재 인증 상태를 나타내는 AuthenticationState 객체를 비동기적으로 반환하는 메서드다.
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        
-        // 관계에서 가져옴
-        var tempWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByUserIdAsync(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
 
-        if(tempWorkspaceUsers.Count == 0)
-        {
-            workspaces = null;
-        }
-        else
-        {
-            foreach(var item in tempWorkspaceUsers)
-            {
-                var temp = await WorkspaceRepository.GetWorkspaceByIdAsync(item.WorkspaceId);
-                workspaces.Add(temp);
-            }
-        }
+        await ReloadWorkspaces();
     }
 
     private void ShowDialogButton() {
@@ -101,6 +90,26 @@
     private void CloseDialogButton() {
         newWorkspace = new Workspace();
         isShowDialog = false;
+    }
+
+    private async Task ReloadWorkspaces()
+    {
+        // 관계에서 가져옴
+        var tempWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByUserIdAsync(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+
+        workspaces = new List<Workspace>();
+        if (tempWorkspaceUsers.Count == 0)
+        {
+            workspaces = null;
+        }
+        else
+        {
+            foreach (var item in tempWorkspaceUsers)
+            {
+                var temp = await WorkspaceRepository.GetWorkspaceByIdAsync(item.WorkspaceId);
+                workspaces.Add(temp);
+            }
+        }
     }
 
     private async Task SaveWorkspace() {
@@ -122,6 +131,8 @@
         newWorkspace = new Workspace();
         isShowDialog = false;
 
-        NavigationManager.NavigateTo("/Workspaces", true); // TODO: 다음에 리로딩말고 다시 그리는 방법으로 수정
+        await ReloadWorkspaces();
+
+        // NavigationManager.NavigateTo("/Workspaces", true); // TODO: 다음에 리로딩말고 다시 그리는 방법으로 수정
     }
 }

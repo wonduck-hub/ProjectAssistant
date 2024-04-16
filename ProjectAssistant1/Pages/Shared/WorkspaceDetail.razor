@@ -1,38 +1,92 @@
 ﻿@page "/WorkspaceDetail/{workspaceId:int}"
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IWorkspaceRepositoryAsync WorkspaceRepository
 @inject NavigationManager NavigationManager
+
+@inject IWorkspaceRepositoryAsync WorkspaceRepository
+@inject IWorkListRepository WorkListRepository
 
 @if(workspace == null)
 {
-    <h3>Error</h3>
+    <h1>Error</h1>
 }
 else
 {
-    <h3>@workspace.Name</h3>
+    <h1>@workspace.Name</h1>
 }
 
-<hr />
-
-<div class="dropdown">
-    <button>드롭다운 메뉴</button>
-    <div class="dropdown-content">
-        <ul>
-            <li><a href="#">링크 1</a></li>
-            <li><a href="#">링크 2</a></li>
-            <li><a href="#">링크 3</a></li>
-        </ul>
-    </div>
+<div class="top-row px-4 auth">
+    <button type="button" class="btn btn-primary" @onclick="@ShowAddCategoryDialogButton">Add new category</button>
 </div>
+
+@if(workLists == null)
+{
+    <h4>카테고리가 없습니다.</h4>
+}
+else
+{
+    foreach(var item in workLists)
+    {
+        <div class="container">
+            <section class="mx-auto my-5">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-title font-weight-bold">@item.Name</div>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td><a>Work</a></td>
+                                </tr>
+                                <tr>
+                                    <td><a>Work</a></td>
+                                </tr>
+                                <tr>
+                                    <td><a>Work</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <input type="button" class="btn btn-primary" value="Add task" />
+                    </div>
+                </div>
+            </section>
+        </div>
+    }
+}
+
+@if (isShowAddCategoryDialog)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add category</h5>
+                </div>
+                <div class="modal-body">
+                    Category name:
+                    <input type="text" @bind="@newWorkList.Name" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @onclick="AddWorksList">Add</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseAddCategoryDialogButton">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
 
 
 @code {
     [Parameter]
-    public int workspaceId { get; set; }
+    public int WorkspaceId { get; set; }
 
-    public Workspace workspace;
+    private Workspace workspace;
 
+    private bool isShowAddCategoryDialog = false;
+
+    private WorkList newWorkList = new WorkList();
+
+    private List<WorkList> workLists = new List<WorkList>();
 
     AuthenticationState authState;
     ClaimsPrincipal user;
@@ -44,7 +98,41 @@ else
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         user = authState.User;
 
-        workspace = await WorkspaceRepository.GetWorkspaceByIdAsync(workspaceId);
+        workspace = await WorkspaceRepository.GetWorkspaceByIdAsync(WorkspaceId);
+
+        await ReloadWorkList();
     }
 
+    private async Task ReloadWorkList()
+    {
+        workLists = new List<WorkList>();
+        workLists = await WorkListRepository.GetWorkListsByWorkspaceIdAsync(workspace.Id);
+    }
+
+    private void ShowAddCategoryDialogButton()
+    {
+        isShowAddCategoryDialog = true;
+    }
+
+    private void CloseAddCategoryDialogButton()
+    {
+        newWorkList = new WorkList();
+        isShowAddCategoryDialog = false;
+    }
+
+    private async Task AddWorksList(MouseEventArgs e)
+    {
+
+        newWorkList.Created = DateTimeOffset.Now;
+        // nameidentifier claim을 찾아 그 값을 CreateUserId에 대입하는 코드
+        newWorkList.CreateUserId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        newWorkList.WorkspaceId = workspace.Id;
+
+        await WorkListRepository.AddWorkListAsync(newWorkList);
+
+        newWorkList = new WorkList();
+        isShowAddCategoryDialog = false;
+
+        await ReloadWorkList();
+    }
 }

@@ -13,6 +13,7 @@ using ProjectAssistant1.Areas.Identity;
 using ProjectAssistant1.Data;
 using ProjectAssistant1.Models;
 using ProjectAssistant1.Models.Models;
+using ProjectAssistant1.Models.Models.ListModel;
 using ProjectAssistant1.Models.Models.UserWorkModel;
 using ProjectAssistant1.Models.Models.WorkspaceUserModel;
 using ProjectAssistant1.Models.UserModel;
@@ -62,6 +63,7 @@ namespace ProjectAssistant1
             services.AddTransient<IWorkRepository, WorkRepository>();
             services.AddTransient<IListWorkspaceRepository, ListWorkspaceRepository>();
             services.AddTransient<IUserWorkRepository, UserWorkRepository>();
+            services.AddTransient<IWorkListRepository,  WorkListRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

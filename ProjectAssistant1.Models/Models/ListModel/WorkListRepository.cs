@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using ProjectAssistant1.Models.UserModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,14 +25,19 @@ namespace ProjectAssistant1.Models.Models.ListModel
             return r;
         }
 
-        public Task<List<WorkList>> GetWorkListByUserIdAsync()
+        public Task<List<WorkList>> GetWorkListsByUserIdAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<WorkList>> GetWorkListByWorkspaceIdAsync()
+        public async Task<List<WorkList>> GetWorkListsByWorkspaceIdAsync(int workspaceId)
         {
-            throw new NotImplementedException();
+            if (workspaceId == null)
+            {
+                throw new ArgumentException("workspace Id cannot be null or empty.");
+            }
+
+            return await _context.Lists.Where(wu => wu.WorkspaceId == workspaceId).ToListAsync();
         }
 
         public Work RemoveWorkListAsync(string userId, int workspaceId)

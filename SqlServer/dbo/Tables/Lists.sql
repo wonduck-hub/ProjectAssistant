@@ -6,5 +6,7 @@
 	[ModifiedUserId] NVARCHAR(450) NULL,
 	[Created] DATETIMEOFFSET (7) DEFAULT ((sysdatetimeoffset() AT TIME ZONE 'Korea Standard Time')) NULL,
 	[Modified] DATETIMEOFFSET (7) NULL,
+	[WorkspaceId] INT NOT NULL,
+	FOREIGN KEY (WorkspaceId) REFERENCES Workspaces(Id)
 )
 
