@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,8 @@ namespace ProjectAssistant1.Models.Models
 
         public async Task<Work> AddWorkAsync(Work task)
         {
+            Debug.Assert(task != null, "work is null");
+
             _context.Works.Add(task);
             await _context.SaveChangesAsync();
 
@@ -26,10 +29,7 @@ namespace ProjectAssistant1.Models.Models
 
         public async Task<List<Work>> GetWorkByListIdAsync(int listId)
         {
-            if (listId == null)
-            {
-                throw new ArgumentException("workspace Id cannot be null or empty.");
-            }
+            Debug.Assert(listId != 0, "listId is 0");
 
             return await _context.Works.Where(wu => wu.ListId == listId).ToListAsync();
         }

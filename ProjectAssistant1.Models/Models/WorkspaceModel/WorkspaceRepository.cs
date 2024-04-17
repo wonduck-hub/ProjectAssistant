@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace ProjectAssistant1.Models.WorkspaceModel
@@ -16,6 +17,8 @@ namespace ProjectAssistant1.Models.WorkspaceModel
 
         public async Task<Workspace> AddWorkspaceAsync(Workspace workspace)
         {
+            Debug.Assert(workspace != null, "workspace is null");
+
             _context.Workspaces.Add(workspace);
             await _context.SaveChangesAsync();
 
@@ -24,6 +27,8 @@ namespace ProjectAssistant1.Models.WorkspaceModel
 
         public async Task<List<Workspace>> GetWorkspaceByCreateUserId(string userId)
         {
+            Debug.Assert(userId != null, "userId is null");
+
             return await _context.Workspaces.Where(w => w.CreateUserId == userId).ToListAsync();
         }
 

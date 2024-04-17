@@ -2,6 +2,7 @@
 using ProjectAssistant1.Models.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,8 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
         }
         public async Task<WorkspaceUser> AddWorkspaceUserAsync(WorkspaceUser r)
         {
+            Debug.Assert(r != null, "WorkspaceUser is null");
+
             _context.WorkspaceUser.Add(r);
             await _context.SaveChangesAsync();
 
@@ -26,10 +29,7 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
 
         public async Task<List<WorkspaceUser>> GetWorkspaceUserByUserIdAsync(string userId)
         {
-            if (userId == null)
-            {
-                throw new ArgumentException("User or User Id cannot be null or empty.");
-            }
+            Debug.Assert(userId != null, "userId is null");
 
             var workspaceUsers = await _context.WorkspaceUser.Where(wu => wu.AspNetUsersId == userId).ToListAsync();
 

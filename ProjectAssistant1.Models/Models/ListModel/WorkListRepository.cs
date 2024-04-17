@@ -2,6 +2,7 @@
 using ProjectAssistant1.Models.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,8 @@ namespace ProjectAssistant1.Models.Models.ListModel
 
         public async Task<WorkList> AddWorkListAsync(WorkList r)
         {
+            Debug.Assert(r != null, "workList is null");
+
             _context.Lists.Add(r);
             await _context.SaveChangesAsync();
 
@@ -32,10 +35,7 @@ namespace ProjectAssistant1.Models.Models.ListModel
 
         public async Task<List<WorkList>> GetWorkListsByWorkspaceIdAsync(int workspaceId)
         {
-            if (workspaceId == null)
-            {
-                throw new ArgumentException("workspace Id cannot be null or empty.");
-            }
+            Debug.Assert(workspaceId != 0, "workspaceId is 0");
 
             return await _context.Lists.Where(wu => wu.WorkspaceId == workspaceId).ToListAsync();
         }

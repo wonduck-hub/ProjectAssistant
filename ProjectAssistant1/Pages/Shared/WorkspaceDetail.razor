@@ -1,4 +1,5 @@
 ﻿@page "/WorkspaceDetail/{workspaceId:int}"
+@using System.Diagnostics
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
@@ -196,7 +197,8 @@ else
 
     private void ShowAddWorkDialogButton(WorkList WorkList)
     {
-        selectedWorkList = WorkList;
+        Debug.Assert(WorkList != null, "WorkList is null");
+    selectedWorkList = WorkList;
         isShowAddWorkDialog = true;
     }
 

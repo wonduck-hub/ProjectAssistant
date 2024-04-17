@@ -1,6 +1,7 @@
 ﻿
 
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace ProjectAssistant1.Models.UserModel
 {
@@ -15,6 +16,8 @@ namespace ProjectAssistant1.Models.UserModel
 
         public async Task<User> AddUserAsync(User user)
         {
+            Debug.Assert(user != null, "user is null");
+
             _context.AspNetUsers.Add(user);
             await _context.SaveChangesAsync();
 
