@@ -7,6 +7,7 @@
 	[Created] DATETIMEOFFSET (7) DEFAULT ((sysdatetimeoffset() AT TIME ZONE 'Korea Standard Time')) NULL,
 	[Modified] DATETIMEOFFSET (7) NULL,
 	[WorkspaceId] INT NOT NULL,
+	[IsDeleted]      BIT                NOT NULL DEFAULT 0,
 	FOREIGN KEY (WorkspaceId) REFERENCES Workspaces(Id)
 )
 

@@ -8,5 +8,6 @@
 	[Created] DATETIMEOFFSET (7) DEFAULT ((sysdatetimeoffset() AT TIME ZONE 'Korea Standard Time')) NULL,
 	[Modified] DATETIMEOFFSET (7) NULL,
 	[ListId] INT NOT NULL,
+	[IsDeleted]      BIT                NOT NULL DEFAULT 0,
 	FOREIGN KEY (ListId) REFERENCES Lists(Id)
 )

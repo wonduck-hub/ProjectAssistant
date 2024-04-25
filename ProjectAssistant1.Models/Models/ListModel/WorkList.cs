@@ -16,6 +16,9 @@ namespace ProjectAssistant1.Models.Models.ListModel
 
         public DateTimeOffset? Created { get; set; }
         public DateTimeOffset? Modified { get; set; }
+
+        public bool IsDeleted { get; set; } = false;
+
         public int WorkspaceId { get; set; }
     }
 }

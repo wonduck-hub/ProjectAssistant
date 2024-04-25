@@ -107,7 +107,10 @@
             foreach (var item in tempWorkspaceUsers)
             {
                 var temp = await WorkspaceRepository.GetWorkspaceByIdAsync(item.WorkspaceId);
-                workspaces.Add(temp);
+                if (!temp.IsDeleted)
+                {
+                    workspaces.Add(temp);
+                }
             }
         }
     }

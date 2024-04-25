@@ -59,6 +59,10 @@ else
         </div>
     }
 }
+<div class="top-row px-4 auth">
+    <button type="button" class="btn btn-danger" @onclick="@ShowDeleteWorkspaceDialogButton">Delete workspace</button>
+</div>
+
 
 @if (isShowAddCategoryDialog)
 {
@@ -107,6 +111,23 @@ else
     <div class="modal-backdrop show"></div>
 }
 
+@if (isShowDeleteWorkspaceDialog)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">정말로 삭제 하시겠습니까?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" @onclick="DeleteWorkspace">Yes</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseDeleteWorkspaceDialogButton">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
 
 @code {
     [Parameter]
@@ -125,6 +146,8 @@ else
     private WorkList selectedWorkList = new WorkList();
 
     private Dictionary<WorkList, List<Work>> workListDic = new Dictionary<WorkList, List<Work>>();
+
+    private bool isShowDeleteWorkspaceDialog = false;
 
     AuthenticationState authState;
     ClaimsPrincipal user;
@@ -195,10 +218,29 @@ else
         await ReloadWorkListDic();
     }
 
+    private void ShowDeleteWorkspaceDialogButton()
+    {
+        isShowDeleteWorkspaceDialog = true;
+    }
+
+    private void CloseDeleteWorkspaceDialogButton()
+    {
+        isShowDeleteWorkspaceDialog = false;
+    }
+
+    private async Task DeleteWorkspace()
+    {
+        await WorkspaceRepository.DeleteWorkspace(WorkspaceId);
+
+        isShowDeleteWorkspaceDialog = false;
+
+        NavigationManager.NavigateTo("/Index");
+    }
+
     private void ShowAddWorkDialogButton(WorkList WorkList)
     {
         Debug.Assert(WorkList != null, "WorkList is null");
-    selectedWorkList = WorkList;
+        selectedWorkList = WorkList;
         isShowAddWorkDialog = true;
     }
 

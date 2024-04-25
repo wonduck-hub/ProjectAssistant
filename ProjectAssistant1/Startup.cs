@@ -55,7 +55,7 @@ namespace ProjectAssistant1
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            // DI Container에 서비스 등록
+            // DI Container에 서비스 따遝
             services.AddTransient<IWorkspaceRepositoryAsync, WorkspaceRepository>();
             services.AddTransient<IUserWorkspaceRepositoryAsync, UserWorkspaceRepository>();
             services.AddTransient<IUserRepositoryAsync, UserRepository>();

@@ -40,6 +40,7 @@ namespace ProjectAssistant1.Models
 
         public DbSet<Workspace> Workspaces { get; set; }
 
+        // UserWorkspaces 대신 WorkspaceUser 사용
         public DbSet<UserWorkspace> UserWorkspaces { get; set; }
 
         public DbSet<WorkspaceUser> WorkspaceUser { get; set; }

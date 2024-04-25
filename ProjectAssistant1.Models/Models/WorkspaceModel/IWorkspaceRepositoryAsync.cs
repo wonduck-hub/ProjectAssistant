@@ -10,6 +10,7 @@ namespace ProjectAssistant1.Models.WorkspaceModel
         Task<Workspace> GetWorkspaceByIdAsync(int id);
         Task<List<Workspace>> GetWorkspaceByCreateUserId(string userId);
         Task<Workspace> UpdateWorkspaceAsync(Workspace workspace);
+        Task DeleteWorkspace(int id);
         Task RemoveWorkspaceAsync(int id);
     }
 }
