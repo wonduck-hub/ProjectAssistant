@@ -29,12 +29,18 @@ else
 {
     foreach (var item in workListDic)
     {
-        <div class="container">
-            <section class="mx-auto my-5">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="card-title font-weight-bold">@item.Key.Name</div>
-                        
+        @if (!item.Key.IsDeleted)
+        {
+            <div class="container">
+                <section class="mx-auto my-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-title font-weight-bold d-flex justify-content-between align-items-center">
+                                <input class="category-name" @onchange="@(e => UpdateCategory(e, item.Key))" value="@item.Key.Name"></input>
+                                <button type="button" class="btn btn-danger" style="float:right" @onclick="@( () => DeleteCategoryButton(item.Key) )">Delete</button>
+                            </div>
+                            
+
                             @if (item.Value == null)
                             {
                                 <div>작업이 없습니다.</div>
@@ -43,26 +49,55 @@ else
                             {
                                 <table class="table">
                                     <tbody>
-                                        @foreach(var v in item.Value)
+                                        @foreach (var v in item.Value)
                                         {
-                                            <tr>
-                                                <td>@v.Name</td>
-                                            </tr>
+                                            @if (!v.IsDeleted)
+                                            {
+                                                <tr @onclick="@( () => ShowWorkDetail(v) )">
+                                                    <td>@v.Name</td>
+                                                </tr>
+                                            }
                                         }
                                     </tbody>
                                 </table>
                             }
-                        <input type="button" class="btn btn-primary" value="Add task" @onclick="@( () => ShowAddWorkDialogButton(item.Key) )" />
+                            <input type="button" class="btn btn-primary" value="Add task" @onclick="@( () => ShowAddWorkDialogButton(item.Key) )" />
+                        </div>
                     </div>
-                </div>
-            </section>
-        </div>
+                </section>
+            </div>
+        }
     }
 }
 <div class="top-row px-4 auth">
     <button type="button" class="btn btn-danger" @onclick="@ShowDeleteWorkspaceDialogButton">Delete workspace</button>
 </div>
 
+@if (isShowWorkDetail)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail</h5>
+                </div>
+                <div class="modal-body">
+                    Work name:
+                    <input type="text" @bind="@selectedWork.Name" />
+                    <br />
+                    Work detail:<br />
+                    <textarea @bind="@selectedWork.TaskDetails" rows="5" cols="35" placeholder="Detail..." style="resize:none;"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" @onclick="@( () => DeleteWorkDialogButton() )">Delete</button>
+                    <button type="button" class="btn btn-success" @onclick="@( () => UpdateWorkDialogButton() )">Save</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseWorkDetailDialogButton">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
 
 @if (isShowAddCategoryDialog)
 {
@@ -149,6 +184,10 @@ else
 
     private bool isShowDeleteWorkspaceDialog = false;
 
+    private bool isShowWorkDetail = false;
+
+    private Work selectedWork = new Work();
+
     AuthenticationState authState;
     ClaimsPrincipal user;
 
@@ -187,6 +226,21 @@ else
     {
         newWorkList = new WorkList();
         isShowAddCategoryDialog = false;
+    }
+
+    private async Task DeleteCategoryButton(WorkList wl)
+    {
+        await WorkListRepository.DeleteWorkListById(wl.Id);
+
+        await ReloadWorkListDic();
+    }
+
+    private async Task UpdateCategory(ChangeEventArgs e, WorkList wl)
+    {
+        wl.Name = e.Value.ToString();
+        await WorkListRepository.UpdateWorkListAsync(wl);
+
+        await ReloadWorkListDic();
     }
 
     private async Task AddWorkList(MouseEventArgs e)
@@ -230,7 +284,7 @@ else
 
     private async Task DeleteWorkspace()
     {
-        await WorkspaceRepository.DeleteWorkspace(WorkspaceId);
+        await WorkspaceRepository.DeleteWorkspaceById(WorkspaceId);
 
         isShowDeleteWorkspaceDialog = false;
 
@@ -242,6 +296,38 @@ else
         Debug.Assert(WorkList != null, "WorkList is null");
         selectedWorkList = WorkList;
         isShowAddWorkDialog = true;
+    }
+
+    private void ShowWorkDetail(Work w)
+    {
+        selectedWork = w;
+        isShowWorkDetail = true;
+    }
+
+    private void CloseWorkDetailDialogButton()
+    {
+        selectedWork = new Work();
+        isShowWorkDetail = false;
+    }
+
+    private async Task UpdateWorkDialogButton()
+    {
+        await WorkRepository.UpdateWorkAsync(selectedWork);
+
+        selectedWork = new Work();
+        isShowWorkDetail = false;
+
+        await ReloadWorkListDic();
+    }
+
+    private async Task DeleteWorkDialogButton()
+    {
+        await WorkRepository.DeleteWorkById(selectedWork.Id);
+
+        selectedWork = new Work();
+        isShowWorkDetail = false;
+
+        await ReloadWorkListDic();
     }
 
     private void CloseAddWorkDialogButton()

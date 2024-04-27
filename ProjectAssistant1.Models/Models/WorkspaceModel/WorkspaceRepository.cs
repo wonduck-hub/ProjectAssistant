@@ -26,7 +26,7 @@ namespace ProjectAssistant1.Models.WorkspaceModel
             return workspace;
         }
 
-        public async Task DeleteWorkspace(int id)
+        public async Task DeleteWorkspaceById(int id)
         {
             Workspace temp = await _context.Workspaces.FindAsync(id);
 
@@ -52,8 +52,6 @@ namespace ProjectAssistant1.Models.WorkspaceModel
         {
             return await _context.Workspaces.ToListAsync();
         }
-
-
 
         public async Task RemoveWorkspaceAsync(int id)
         {

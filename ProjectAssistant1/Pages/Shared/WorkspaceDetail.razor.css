@@ -42,3 +42,8 @@
     }
 }
 
+.category-name {
+    font-size: 1.17em; /* h3의 기본 글꼴 크기 */
+    font-weight: bold; /* h3의 기본 글꼴 두께 */
+    border: none;
+}

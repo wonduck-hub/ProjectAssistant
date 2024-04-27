@@ -10,6 +10,7 @@ namespace ProjectAssistant1.Models.Models.ListModel
     public interface IWorkListRepository
     {
         Task<WorkList> AddWorkListAsync(WorkList r);
+        Task DeleteWorkListById(int id);
         Task<List<WorkList>> GetWorkListsByUserIdAsync();
         Task<List<WorkList>> GetWorkListsByWorkspaceIdAsync(int workspaceId);
         Task<WorkList> UpdateWorkListAsync(WorkList r);

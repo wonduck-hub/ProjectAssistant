@@ -27,6 +27,16 @@ namespace ProjectAssistant1.Models.Models
             return task;
         }
 
+        public async Task DeleteWorkById(int id)
+        {
+            Work temp = await _context.Works.FindAsync(id);
+
+            temp.IsDeleted = true;
+
+            _context.Entry(temp).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<Work>> GetWorkByListIdAsync(int listId)
         {
             Debug.Assert(listId != 0, "listId is 0");
@@ -44,9 +54,12 @@ namespace ProjectAssistant1.Models.Models
             throw new NotImplementedException();
         }
 
-        public Task<Work> UpdateWorkAsync(Work task)
+        public async Task<Work> UpdateWorkAsync(Work work)
         {
-            throw new NotImplementedException();
+            _context.Entry(work).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return work;
         }
     }
 }

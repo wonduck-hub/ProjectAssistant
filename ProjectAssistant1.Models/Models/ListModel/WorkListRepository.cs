@@ -28,6 +28,16 @@ namespace ProjectAssistant1.Models.Models.ListModel
             return r;
         }
 
+        public async Task DeleteWorkListById(int id)
+        {
+            WorkList temp = await _context.Lists.FindAsync(id);
+
+            temp.IsDeleted = true;
+
+            _context.Entry(temp).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }
+
         public Task<List<WorkList>> GetWorkListsByUserIdAsync()
         {
             throw new NotImplementedException();
@@ -45,9 +55,12 @@ namespace ProjectAssistant1.Models.Models.ListModel
             throw new NotImplementedException();
         }
 
-        public Task<WorkList> UpdateWorkListAsync(WorkList r)
+        public async Task<WorkList> UpdateWorkListAsync(WorkList wl)
         {
-            throw new NotImplementedException();
+            _context.Entry(wl).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return wl;
         }
     }
 }
