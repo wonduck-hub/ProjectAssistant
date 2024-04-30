@@ -1,6 +1,4 @@
-﻿
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace ProjectAssistant1.Models.UserModel
@@ -32,6 +30,11 @@ namespace ProjectAssistant1.Models.UserModel
         public async Task<List<User>> GetUsersAsync()
         {
             return await _context.AspNetUsers.ToListAsync();
+        }
+
+        public async Task<User> GetFirstUserByName(string name)
+        {
+            return await _context.AspNetUsers.FirstOrDefaultAsync(user => user.UserName == name);
         }
 
         public async Task RemoveUserAsync(string id)

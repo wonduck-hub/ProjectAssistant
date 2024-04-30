@@ -7,6 +7,8 @@
 @inject IWorkspaceRepositoryAsync WorkspaceRepository
 @inject IWorkListRepository WorkListRepository
 @inject IWorkRepository WorkRepository
+@inject IUserRepositoryAsync UserRepository
+@inject IWorkspaceUserRepository WorkspaceUserRepository
 
 @if (workspace == null)
 {
@@ -19,6 +21,11 @@ else
 
 <div class="top-row px-4 auth">
     <button type="button" class="btn btn-primary" @onclick="@ShowAddCategoryDialogButton">Add new category</button>
+</div>
+
+<br />
+<div class="card-title font-weight-bold d-flex justify-content-between align-items-center">
+    <img src="/images/plus-user.png" width="25" hight="25" @onclick="ShowAddUserDialog" />
 </div>
 
 @if (workListDic == null)
@@ -37,7 +44,7 @@ else
                         <div class="card-body">
                             <div class="card-title font-weight-bold d-flex justify-content-between align-items-center">
                                 <input class="category-name" @onchange="@(e => UpdateCategory(e, item.Key))" value="@item.Key.Name"></input>
-                                <button type="button" class="btn btn-danger" style="float:right" @onclick="@( () => DeleteCategoryButton(item.Key) )">Delete</button>
+                                <img src="/images/trash.png" width="20" hight="20" @onclick="@( () => DeleteCategoryButton(item.Key) )"></img>
                             </div>
                             
 
@@ -164,6 +171,41 @@ else
     <div class="modal-backdrop show"></div>
 }
 
+@if (isShowAddUserDialog)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Join user</h5>
+                </div>
+                <div class="modal-body">
+                    User name:
+                    <input type="text" @onchange="@( e => SearchUser(e))" placeholder="Enter user name..." />
+                    <br />
+                    <hr />
+                    @if(searchedUser == null)
+                    {
+                        <div>해당 이름의 유저 없음.</div>
+                    }
+                    else
+                    {
+                        <div>
+                            Name: @searchedUser.UserName <br />
+                            Email: @searchedUser.Email<br />
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" disabled="@disableAddUserButton" @onclick="AddUser">Add</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseAddUserDialog">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
+
 @code {
     [Parameter]
     public int WorkspaceId { get; set; }
@@ -174,11 +216,11 @@ else
 
     private bool isShowAddWorkDialog = false;
 
-    private WorkList newWorkList = new WorkList();
+    private WorkList newWorkList = null;
 
-    private Work newWork = new Work();
+    private Work newWork = null;
 
-    private WorkList selectedWorkList = new WorkList();
+    private WorkList selectedWorkList = null;
 
     private Dictionary<WorkList, List<Work>> workListDic = new Dictionary<WorkList, List<Work>>();
 
@@ -186,7 +228,13 @@ else
 
     private bool isShowWorkDetail = false;
 
-    private Work selectedWork = new Work();
+    private Work selectedWork = null;
+
+    private bool isShowAddUserDialog = false;
+
+    private bool disableAddUserButton = true;
+
+    private User searchedUser = null;
 
     AuthenticationState authState;
     ClaimsPrincipal user;
@@ -207,7 +255,7 @@ else
     {
         workListDic = new Dictionary<WorkList, List<Work>>();
 
-        List<WorkList> tempWorkLists = new List<WorkList>();
+        List<WorkList> tempWorkLists = null;
         tempWorkLists = await WorkListRepository.GetWorkListsByWorkspaceIdAsync(workspace.Id);
 
         foreach (var item in tempWorkLists)
@@ -217,14 +265,33 @@ else
         }
     }
 
+    private async Task AddWorkList(MouseEventArgs e)
+    {
+
+        newWorkList.Created = DateTimeOffset.Now;
+        // nameidentifier claim을 찾아 그 값을 CreateUserId에 대입하는 코드
+        newWorkList.CreateUserId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        newWorkList.WorkspaceId = workspace.Id;
+
+        await WorkListRepository.AddWorkListAsync(newWorkList);
+
+        newWorkList = null;
+        isShowAddCategoryDialog = false;
+
+        await ReloadWorkListDic();
+    }
+
+    // 카테고리
+    #region
     private void ShowAddCategoryDialogButton()
     {
+        newWorkList = new WorkList();
         isShowAddCategoryDialog = true;
     }
 
     private void CloseAddCategoryDialogButton()
     {
-        newWorkList = new WorkList();
+        newWorkList = null;
         isShowAddCategoryDialog = false;
     }
 
@@ -242,31 +309,20 @@ else
 
         await ReloadWorkListDic();
     }
+    #endregion
 
-    private async Task AddWorkList(MouseEventArgs e)
-    {
-
-        newWorkList.Created = DateTimeOffset.Now;
-        // nameidentifier claim을 찾아 그 값을 CreateUserId에 대입하는 코드
-        newWorkList.CreateUserId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        newWorkList.WorkspaceId = workspace.Id;
-
-        await WorkListRepository.AddWorkListAsync(newWorkList);
-
-        newWorkList = new WorkList();
-        isShowAddCategoryDialog = false;
-
-        await ReloadWorkListDic();
-    }
+    // Work
+    #region
     private async Task AddWorks()
     {
+
         newWork.Created = DateTimeOffset.Now;
         newWork.CreateUserId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         newWork.ListId = selectedWorkList.Id;
 
         await WorkRepository.AddWorkAsync(newWork);
 
-        newWork = new Work();
+        newWork = null;
         isShowAddWorkDialog = false;
 
         await ReloadWorkListDic();
@@ -274,12 +330,15 @@ else
 
     private void ShowDeleteWorkspaceDialogButton()
     {
+
         isShowDeleteWorkspaceDialog = true;
     }
 
     private void CloseDeleteWorkspaceDialogButton()
     {
         isShowDeleteWorkspaceDialog = false;
+        newWork = null;
+        isShowAddWorkDialog = false;
     }
 
     private async Task DeleteWorkspace()
@@ -294,6 +353,7 @@ else
     private void ShowAddWorkDialogButton(WorkList WorkList)
     {
         Debug.Assert(WorkList != null, "WorkList is null");
+        newWork = new Work();
         selectedWorkList = WorkList;
         isShowAddWorkDialog = true;
     }
@@ -335,4 +395,49 @@ else
         newWork = new Work();
         isShowAddWorkDialog = false;
     }
+    #endregion
+
+    // AddUser
+    #region
+    private void ShowAddUserDialog()
+    {
+        isShowAddUserDialog = true;
+        disableAddUserButton = true;
+    }
+
+    private void CloseAddUserDialog()
+    {
+        isShowAddUserDialog = false;
+        searchedUser = null;
+        disableAddUserButton = true;
+    }
+
+    private async Task AddUser()
+    {
+        Debug.Assert(searchedUser != null);
+        Debug.Assert(searchedUser.Id != null);
+
+        WorkspaceUser wu = new WorkspaceUser(searchedUser.Id, WorkspaceId);
+        await WorkspaceUserRepository.AddWorkspaceUserAsync(wu);
+
+        searchedUser = null;
+        disableAddUserButton = true;
+    }
+
+    private async Task SearchUser(ChangeEventArgs e)
+    {
+        searchedUser =  await UserRepository.GetFirstUserByName(e.Value.ToString());
+
+        if (searchedUser == null)
+        {
+            disableAddUserButton = true;
+        }
+        else
+        {
+            disableAddUserButton = false;
+        }
+    }
+
+    #endregion
+    
 }
