@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,8 +21,16 @@ namespace ProjectAssistant1.Models.Models.UserWorkModel
         {
             Debug.Assert(newUserWork != null, "workList is null");
 
-            _context.UserWork.Add(newUserWork);
-            await _context.SaveChangesAsync();
+            var existingWorkspaceUser = await _context.UserWork
+                .Where(wu => wu.UserId == newUserWork.UserId && wu.WorkspaceId == newUserWork.WorkspaceId && wu.WorkId == newUserWork.WorkId)
+                .FirstOrDefaultAsync();
+
+            // 이미 존재하는 WorkspaceUser가 없을 경우에만 추가합니다.
+            if (existingWorkspaceUser == null)
+            {
+                _context.UserWork.Add(newUserWork);
+                await _context.SaveChangesAsync();
+            }
 
             return newUserWork;
         }
@@ -31,14 +40,34 @@ namespace ProjectAssistant1.Models.Models.UserWorkModel
             throw new NotImplementedException();
         }
 
-        public Task<List<UserWork>> GetUserWorkByWorkspaceIdAsync()
+        public async Task<List<UserWork>> GetUserWorkByWorkIdAsync(int workId)
         {
-            throw new NotImplementedException();
+            return await _context.UserWork
+                    .Where(wu => wu.WorkId == workId)
+                    .Include(wu => wu.User)
+                    .Include(wu => wu.Workspace)
+                    .ToListAsync();
         }
 
-        public Work RemoveUserWorkAsync(string userId, int listId)
+        public async Task<Work> RemoveUserWorkAsync(string userId, int workId, int workspaceId)
         {
-            throw new NotImplementedException();
+            // UserWork 엔티티를 찾습니다.
+            var userWork = await _context.UserWork
+                .Where(uw => uw.UserId == userId && uw.WorkId == workId && uw.WorkspaceId == workspaceId)
+                .FirstOrDefaultAsync();
+
+            if (userWork == null)
+            {
+                // 해당하는 UserWork가 없으면 null을 반환합니다.
+                return null;
+            }
+
+            // UserWork 엔티티를 제거합니다.
+            _context.UserWork.Remove(userWork);
+            await _context.SaveChangesAsync();
+
+            // 제거된 작업을 반환합니다.
+            return userWork.Work;
         }
 
         public Task<UserWork> UpdateUserWorkAsync(UserWork r)

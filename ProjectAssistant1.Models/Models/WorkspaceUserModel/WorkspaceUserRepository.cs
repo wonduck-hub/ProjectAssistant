@@ -21,8 +21,17 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
         {
             Debug.Assert(r != null, "WorkspaceUser is null");
 
-            _context.WorkspaceUser.Add(r);
-            await _context.SaveChangesAsync();
+            // 이미 존재하는 WorkspaceUser인지 확인합니다.
+            var existingWorkspaceUser = await _context.WorkspaceUser
+                .Where(wu => wu.AspNetUsersId == r.AspNetUsersId && wu.WorkspaceId == r.WorkspaceId)
+                .FirstOrDefaultAsync();
+
+            // 이미 존재하는 WorkspaceUser가 없을 경우에만 추가합니다.
+            if (existingWorkspaceUser == null)
+            {
+                _context.WorkspaceUser.Add(r);
+                await _context.SaveChangesAsync();
+            }
 
             return r;
         }
@@ -67,9 +76,19 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
             throw new NotImplementedException();
         }
 
-        public Task RemoveWorkspaceUserAsync(string userId, int workspaceId)
+        public async Task RemoveWorkspaceUserAsync(string userId, int workspaceId)
         {
-            throw new NotImplementedException();
+            // WorkspaceUser 엔티티를 찾습니다.
+            var workspaceUser = await _context.WorkspaceUser
+                .Where(wu => wu.AspNetUsersId == userId && wu.WorkspaceId == workspaceId)
+                .FirstOrDefaultAsync();
+
+            if (workspaceUser != null)
+            {
+                // 해당하는 WorkspaceUser가 있으면 제거합니다.
+                _context.WorkspaceUser.Remove(workspaceUser);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public Task<WorkspaceUser> UpdateWorkspaceUserAsync(WorkspaceUser r)

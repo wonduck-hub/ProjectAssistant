@@ -7,14 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectAssistant1.Models.Models.UserWorkModel
+namespace ProjectAssistant1.Models.Models.WorkspaceWorkModel
 {
-    public class UserWork
+    public class WorkspaceWork
     {
-        public UserWork(int workId, string userId, int workspaceId)
+        public WorkspaceWork() { }
+
+        public WorkspaceWork(int workId, int workspaceId)
         {
             WorkId = workId;
-            UserId = userId;
             WorkspaceId = workspaceId;
         }
 
@@ -25,12 +26,9 @@ namespace ProjectAssistant1.Models.Models.UserWorkModel
         public int WorkId { get; set; }
 
         [Required]
-        public string UserId { get; set; }
-
         public int WorkspaceId { get; set; }
 
-        // 관계용
-        public User User { get; set; }
+        // Navigation properties
         public Work Work { get; set; }
         public Workspace Workspace { get; set; }
     }

@@ -8,6 +8,7 @@ using ProjectAssistant1.Models.Models.WorkspaceUserModel;
 using ProjectAssistant1.Models.Models.ListModel;
 using ProjectAssistant1.Models.Models;
 using ProjectAssistant1.Models.Models.UserWorkModel;
+using ProjectAssistant1.Models.Models.WorkspaceWorkModel;
 
 namespace ProjectAssistant1.Models
 {
@@ -48,6 +49,32 @@ namespace ProjectAssistant1.Models
                 .HasOne(wu => wu.Workspace)
                 .WithMany(w => w.WorkspaceUsers)
                 .HasForeignKey(wu => wu.WorkspaceId);
+
+            modelBuilder.Entity<UserWork>()
+                .HasOne(wu => wu.User)
+                .WithMany(u => u.UserWorks)
+                .HasForeignKey(wu => wu.UserId);
+
+            modelBuilder.Entity<UserWork>()
+                .HasOne(wu => wu.Work)
+                .WithMany(w => w.UserWorks)
+                .HasForeignKey(wu => wu.WorkId);
+
+            modelBuilder.Entity<WorkspaceWork>()
+                .HasOne(wu => wu.Work)
+                .WithMany(u => u.WorkspaceWorks)
+                .HasForeignKey(wu => wu.WorkId);
+
+            modelBuilder.Entity<WorkspaceWork>()
+                .HasOne(wu => wu.Workspace)
+                .WithMany(w => w.WorkspaceWorks)
+                .HasForeignKey(wu => wu.WorkspaceId);
+
+            modelBuilder.Entity<UserWork>()
+                .HasOne(uw => uw.Workspace)
+                .WithMany(w => w.UserWorks)
+                .HasForeignKey(uw => uw.WorkspaceId);
+
         }
 
 

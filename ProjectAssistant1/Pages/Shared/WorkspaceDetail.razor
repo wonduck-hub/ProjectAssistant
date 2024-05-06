@@ -10,6 +10,8 @@
 @inject IWorkRepository WorkRepository
 @inject IUserRepositoryAsync UserRepository
 @inject IWorkspaceUserRepository WorkspaceUserRepository
+@inject IUserWorkRepository UserWorkRepository
+@inject IWorkspaceWorkRepository WorkspaceWorkRepository
 
 @if (workspace == null)
 {
@@ -154,12 +156,19 @@ else
                     <textarea @bind="@selectedWork.TaskDetails" rows="5" cols="35" placeholder="Detail..." style="resize:none;"></textarea>
                     <br />
                     <label>멤버:</label>
-                    <select>
-                        @foreach(var u in workspaceUserList)
+                    <ul class="list-group">
+                        @foreach (var u in selectedWorkMemberUserWork)
                         {
-                            <option>@u.User.UserName</option>
+                            <li class="list-group-item list-group-item-action" @onclick="@( () => DeleteWorkMember(u) )">@u.User.UserName</li>
                         }
-                    </select>
+                    </ul>
+                    <label>추가:</label>
+                    <ul class="list-group">
+                        @foreach (var u in workspaceUserList)
+                        {
+                            <li class="list-group-item list-group-item-action" @onclick="@( () => AddWorkMember(u) )">@u.User.UserName</li>
+                        }
+                    </ul>
                     <br />
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" @bind="selectedWork.IsSuccess" />
@@ -273,6 +282,7 @@ else
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" disabled="@disableAddUserButton" @onclick="AddUser">Add</button>
+                    <button type="button" class="btn btn-danger" disabled="@disableDeleteUserButton" @onclick="DeleteUser">Delete</button>
                     <button type="button" class="btn btn-secondary" @onclick="CloseAddUserDialog">Close</button>
                 </div>
             </div>
@@ -309,9 +319,13 @@ else
 
     private bool disableAddUserButton = true;
 
+    private bool disableDeleteUserButton = true;
+
     private User searchedUser = null;
 
     private List<WorkspaceUser> workspaceUserList = null;
+
+    private List<UserWork> selectedWorkMemberUserWork = null;
 
     AuthenticationState authState;
     ClaimsPrincipal user;
@@ -346,6 +360,10 @@ else
         #region WorkspaceUserList
         workspaceUserList = await WorkspaceUserRepository.GetUsersByWorkspaceId(WorkspaceId);
         #endregion
+
+        #region Work에 할당된 User들
+
+        #endregion
     }
 
     private async Task AddWorkList(MouseEventArgs e)
@@ -364,8 +382,24 @@ else
         await ReloadData();
     }
 
-    // 카테고리
-    #region
+    #region 작업에 유저 할당
+    public async Task AddWorkMember(WorkspaceUser wu)
+    {
+        UserWork newUserWork = new UserWork(selectedWork.Id, wu.User.Id, WorkspaceId);
+        await UserWorkRepository.AddUserWorkAsync(newUserWork);
+
+        selectedWorkMemberUserWork = await UserWorkRepository.GetUserWorkByWorkIdAsync(selectedWork.Id);
+    }
+
+    public async Task DeleteWorkMember(UserWork wu)
+    {
+        await UserWorkRepository.RemoveUserWorkAsync(wu.UserId, wu.WorkId, wu.WorkspaceId);
+
+        selectedWorkMemberUserWork = await UserWorkRepository.GetUserWorkByWorkIdAsync(selectedWork.Id);
+    }
+    #endregion
+
+    #region 카테고리
     private void ShowAddCategoryDialogButton()
     {
         newWorkList = new WorkList();
@@ -394,15 +428,14 @@ else
     }
     #endregion
 
-    // Work
-    #region
+    #region Work
     private async Task AddWorks()
     {
 
         newWork.Created = DateTimeOffset.Now;
         newWork.CreateUserId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         newWork.ListId = selectedWorkList.Id;
-        
+
 
         await WorkRepository.AddWorkAsync(newWork);
 
@@ -414,7 +447,6 @@ else
 
     private void ShowDeleteWorkspaceDialogButton()
     {
-
         isShowDeleteWorkspaceDialog = true;
     }
 
@@ -442,9 +474,10 @@ else
         isShowAddWorkDialog = true;
     }
 
-    private void ShowWorkDetail(Work w)
+    private async Task ShowWorkDetail(Work w)
     {
         selectedWork = w;
+        selectedWorkMemberUserWork = await UserWorkRepository.GetUserWorkByWorkIdAsync(w.Id);
         isShowWorkDetail = true;
     }
 
@@ -481,12 +514,12 @@ else
     }
     #endregion
 
-    // AddUser
-    #region
+    #region AddUser
     private void ShowAddUserDialog()
     {
         isShowAddUserDialog = true;
         disableAddUserButton = true;
+        disableDeleteUserButton = true;
     }
 
     private void CloseAddUserDialog()
@@ -494,6 +527,7 @@ else
         isShowAddUserDialog = false;
         searchedUser = null;
         disableAddUserButton = true;
+        disableDeleteUserButton = true;
     }
 
     private async Task AddUser()
@@ -505,7 +539,24 @@ else
         await WorkspaceUserRepository.AddWorkspaceUserAsync(wu);
 
         searchedUser = null;
-        disableAddUserButton = true;
+
+        await ReloadData();
+
+        isShowAddUserDialog = false;
+    }
+
+    private async Task DeleteUser()
+    {
+        Debug.Assert(searchedUser != null);
+        Debug.Assert(searchedUser.Id != null);
+
+        await WorkspaceUserRepository.RemoveWorkspaceUserAsync(searchedUser.Id, WorkspaceId);
+
+        searchedUser = null;
+
+        await ReloadData();
+
+        isShowAddUserDialog = false;
     }
 
     private async Task SearchUser(ChangeEventArgs e)
@@ -515,10 +566,12 @@ else
         if (searchedUser == null)
         {
             disableAddUserButton = true;
+            disableDeleteUserButton = true;
         }
         else
         {
             disableAddUserButton = false;
+            disableDeleteUserButton = false;
         }
     }
 
