@@ -1,5 +1,4 @@
 ﻿using ProjectAssistant1.Models.UserModel;
-using ProjectAssistant1.Models.UserWorkspacesModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +10,11 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
     public interface IWorkspaceUserRepository
     {
         Task<WorkspaceUser> AddWorkspaceUserAsync(WorkspaceUser r);
+        Task<List<WorkspaceUser>> GetUsersByWorkspaceId(int workspaceId);
+        Task<List<WorkspaceUser>> GetWorkspacesByUserId(string userId);
         Task<List<WorkspaceUser>> GetWorkspaceUserByUserIdAsync(string userId);
-        Task<List<WorkspaceUser>> GetWorkspaceUserByWorkspaceIdAsync();
+        Task<List<WorkspaceUser>> GetWorkspaceUserByWorkspaceIdAsync(int id);
         Task<WorkspaceUser> UpdateWorkspaceUserAsync(WorkspaceUser r);
-        Work RemoveWorkspaceUserAsync(string userId, int workspaceId);
+        Task RemoveWorkspaceUserAsync(string userId, int workspaceId);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using ProjectAssistant1.Models.Models.WorkspaceUserModel;
 
 namespace ProjectAssistant1.Models.UserModel { 
     public class User
@@ -21,5 +22,8 @@ namespace ProjectAssistant1.Models.UserModel {
         public DateTimeOffset? LockoutEnd { get; set; }
         public bool? LockoutEnabled { get; set; }
         public int? AccessFailedCount { get; set; }
+
+        // 관계용
+        public IEnumerable<WorkspaceUser> WorkspaceUsers { get; set; }
     }
 }

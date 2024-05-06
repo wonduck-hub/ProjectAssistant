@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProjectAssistant1.Models.Models.WorkspaceUserModel;
+using System;
 
 namespace ProjectAssistant1.Models.WorkspaceModel
 {
@@ -14,5 +15,8 @@ namespace ProjectAssistant1.Models.WorkspaceModel
         public DateTimeOffset? Modified { get; set; }
 
         public bool IsDeleted { get; set; } = false;
+
+        // 관계용
+        public IEnumerable<WorkspaceUser> WorkspaceUsers { get; set; }
     }
 }

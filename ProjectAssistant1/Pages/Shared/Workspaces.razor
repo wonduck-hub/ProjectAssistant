@@ -22,17 +22,20 @@
             </tr>
         </thead>
         <tbody>
-            @if(workspaces == null)
+            @if (workspaces == null)
             {
                 <div>새로운 작업공간을 추가하시오.</div>
             }
             else {
-                @foreach(var w in workspaces)
+                @foreach (var w in workspaces)
                 {
-                    <tr>
-                        <td><a href="/WorkspaceDetail/@w.Id">@w.Name</a></td>
-                        <td>@w.Created</td>
-                    </tr>
+                    @if (!w.Workspace.IsDeleted)
+                    {
+                        <tr>
+                            <td><a href="/WorkspaceDetail/@w.Workspace.Id">@w.Workspace.Name</a></td>
+                            <td>@w.Workspace.Created</td>
+                        </tr>
+                    }
                 }
             }
         </tbody>
@@ -66,7 +69,7 @@
 
     private bool isShowDialog = false;
 
-    private List<Workspace> workspaces = new List<Workspace>();
+    private List<WorkspaceUser> workspaces = null;
 
     private Workspace newWorkspace = new Workspace();
 
@@ -95,24 +98,7 @@
     private async Task ReloadWorkspaces()
     {
         // 관계에서 가져옴
-        var tempWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByUserIdAsync(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
-
-        workspaces = new List<Workspace>();
-        if (tempWorkspaceUsers.Count == 0)
-        {
-            workspaces = null;
-        }
-        else
-        {
-            foreach (var item in tempWorkspaceUsers)
-            {
-                var temp = await WorkspaceRepository.GetWorkspaceByIdAsync(item.WorkspaceId);
-                if (!temp.IsDeleted)
-                {
-                    workspaces.Add(temp);
-                }
-            }
-        }
+        workspaces = await WorkspaceUserRepository.GetWorkspacesByUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
     }
 
     private async Task SaveWorkspace() {

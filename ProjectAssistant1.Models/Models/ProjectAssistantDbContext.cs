@@ -36,6 +36,21 @@ namespace ProjectAssistant1.Models
             }
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // 테이블 간의 관계를 설정하는 함수다.
+            modelBuilder.Entity<WorkspaceUser>()
+                .HasOne(wu => wu.User)
+                .WithMany(u => u.WorkspaceUsers)
+                .HasForeignKey(wu => wu.AspNetUsersId);
+
+            modelBuilder.Entity<WorkspaceUser>()
+                .HasOne(wu => wu.Workspace)
+                .WithMany(w => w.WorkspaceUsers)
+                .HasForeignKey(wu => wu.WorkspaceId);
+        }
+
+
         public DbSet<User> AspNetUsers { get; set; }
 
         public DbSet<Workspace> Workspaces { get; set; }

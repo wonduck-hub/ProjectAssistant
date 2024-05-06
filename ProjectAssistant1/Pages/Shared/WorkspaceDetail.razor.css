@@ -47,3 +47,20 @@
     font-weight: bold; /* h3의 기본 글꼴 두께 */
     border: none;
 }
+
+.table-name {
+    width: 20%;
+}
+
+.table-status {
+    width: 20%;
+}
+
+table {
+    text-align: center;
+}
+
+td {
+    text-align: center;
+}
+

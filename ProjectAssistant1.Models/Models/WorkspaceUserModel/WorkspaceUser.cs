@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ProjectAssistant1.Models.UserModel;
+using ProjectAssistant1.Models.WorkspaceModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -25,5 +27,9 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
 
         [Required]
         public int WorkspaceId { get; set; }
+
+        // Navigation properties
+        public User User { get; set; }
+        public Workspace Workspace { get; set; }
     }
 }

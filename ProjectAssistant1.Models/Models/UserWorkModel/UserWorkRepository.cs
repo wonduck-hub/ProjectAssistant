@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,9 +16,14 @@ namespace ProjectAssistant1.Models.Models.UserWorkModel
             _context = context;
         }
 
-        public Task<UserWork> AddUserWorkAsync(UserWork r)
+        public async Task<UserWork> AddUserWorkAsync(UserWork newUserWork)
         {
-            throw new NotImplementedException();
+            Debug.Assert(newUserWork != null, "workList is null");
+
+            _context.UserWork.Add(newUserWork);
+            await _context.SaveChangesAsync();
+
+            return newUserWork;
         }
 
         public Task<List<UserWork>> GetUserWorkByUserIdAsync(string userId)

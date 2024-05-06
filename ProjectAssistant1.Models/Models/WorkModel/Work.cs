@@ -10,6 +10,9 @@ namespace ProjectAssistant1.Models.Models
     {
         public int Id { get; set; }
         public string? Name { get; set; }
+        public DateTimeOffset? StartDate { get; set; }
+        public DateTimeOffset? EndDate { get; set; }
+        public bool IsSuccess { get; set; }
         public string? CreateUserId { get; set; }
         public string? ModifiedUserId { get; set; }
         public string? TaskDetails { get; set; }

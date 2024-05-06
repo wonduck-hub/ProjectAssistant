@@ -27,6 +27,22 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
             return r;
         }
 
+        public async Task<List<WorkspaceUser>> GetUsersByWorkspaceId(int workspaceId)
+        {
+            return await _context.WorkspaceUser
+                    .Where(wu => wu.WorkspaceId == workspaceId)
+                    .Include(wu => wu.User)
+                    .ToListAsync();
+        }
+
+        public async Task<List<WorkspaceUser>> GetWorkspacesByUserId(string userId)
+        {
+            return await _context.WorkspaceUser
+                    .Where(wu => wu.AspNetUsersId == userId)
+                    .Include(wu => wu.Workspace)
+                    .ToListAsync();
+        }
+
         public async Task<List<WorkspaceUser>> GetWorkspaceUserByUserIdAsync(string userId)
         {
             Debug.Assert(userId != null, "userId is null");
@@ -37,12 +53,21 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
 
         }
 
-        public Task<List<WorkspaceUser>> GetWorkspaceUserByWorkspaceIdAsync()
+        public async Task<List<WorkspaceUser>> GetWorkspaceUserByWorkspaceIdAsync(int id)
+        {
+            Debug.Assert(id > 0, "userId is null");
+
+            var workspaceUsers = await _context.WorkspaceUser.Where(wu => wu.WorkspaceId == id).ToListAsync();
+
+            return workspaceUsers;
+        }
+
+        public Task<List<WorkspaceUser>> GetWorkspaceUsers()
         {
             throw new NotImplementedException();
         }
 
-        public Work RemoveWorkspaceUserAsync(string userId, int workspaceId)
+        public Task RemoveWorkspaceUserAsync(string userId, int workspaceId)
         {
             throw new NotImplementedException();
         }
