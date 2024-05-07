@@ -36,39 +36,22 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
             return r;
         }
 
-        public async Task<List<WorkspaceUser>> GetUsersByWorkspaceId(int workspaceId)
+        public async Task<List<WorkspaceUser>> GetWorkspaceUserByWorkspaceId(int workspaceId)
         {
             return await _context.WorkspaceUser
-                    .Where(wu => wu.WorkspaceId == workspaceId)
+                    .Where(wu => wu.WorkspaceId == workspaceId && wu.Workspace.IsDeleted == false)
                     .Include(wu => wu.User)
-                    .ToListAsync();
-        }
-
-        public async Task<List<WorkspaceUser>> GetWorkspacesByUserId(string userId)
-        {
-            return await _context.WorkspaceUser
-                    .Where(wu => wu.AspNetUsersId == userId)
                     .Include(wu => wu.Workspace)
                     .ToListAsync();
         }
 
-        public async Task<List<WorkspaceUser>> GetWorkspaceUserByUserIdAsync(string userId)
+        public async Task<List<WorkspaceUser>> GetWorkspaceUserByUserId(string userId)
         {
-            Debug.Assert(userId != null, "userId is null");
-
-            var workspaceUsers = await _context.WorkspaceUser.Where(wu => wu.AspNetUsersId == userId).ToListAsync();
-
-            return workspaceUsers;
-
-        }
-
-        public async Task<List<WorkspaceUser>> GetWorkspaceUserByWorkspaceIdAsync(int id)
-        {
-            Debug.Assert(id > 0, "userId is null");
-
-            var workspaceUsers = await _context.WorkspaceUser.Where(wu => wu.WorkspaceId == id).ToListAsync();
-
-            return workspaceUsers;
+            return await _context.WorkspaceUser
+                    .Where(wu => wu.AspNetUsersId == userId && wu.Workspace.IsDeleted == false)
+                    .Include(wu => wu.User)
+                    .Include(wu => wu.Workspace)
+                    .ToListAsync();
         }
 
         public Task<List<WorkspaceUser>> GetWorkspaceUsers()

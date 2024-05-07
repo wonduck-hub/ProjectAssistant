@@ -11,6 +11,7 @@ namespace ProjectAssistant1.Models.Models.UserWorkModel
         Task<UserWork> AddUserWorkAsync(UserWork r);
         Task<List<UserWork>> GetUserWorkByUserIdAsync(string userId);
         Task<List<UserWork>> GetUserWorkByWorkIdAsync(int workId);
+        Task<List<UserWork>> GetUserWorkByWorkspaceIdAsync(int workspaceId);
         Task<UserWork> UpdateUserWorkAsync(UserWork r);
         Task<Work> RemoveUserWorkAsync(string userId, int workId, int workspaceId);
     }

@@ -44,6 +44,13 @@ namespace ProjectAssistant1.Models.Models
             return await _context.Works.Where(wu => wu.ListId == listId).ToListAsync();
         }
 
+        public async Task<Work> GetWorkByCreatedUserIdListIdTimeAsync(string userId, int listId, DateTimeOffset t)
+        {
+            return await _context.Works
+                    .Where(w => w.CreateUserId == userId && w.ListId == listId && w.Created == t)
+                    .FirstOrDefaultAsync();
+        }
+
         public Task<List<Work>> GetWorksAsync()
         {
             throw new NotImplementedException();

@@ -18,7 +18,7 @@ namespace ProjectAssistant1.Models.Models
         public string? CreateUserId { get; set; }
         public string? ModifiedUserId { get; set; }
         public string? TaskDetails { get; set; }
-        public DateTimeOffset? Created { get; set; }
+        public DateTimeOffset Created { get; set; }
         public DateTimeOffset? Modified { get; set; }
         public bool IsDeleted { get; set; } = false;
         public int ListId { get; set; }

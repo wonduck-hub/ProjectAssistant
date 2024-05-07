@@ -82,7 +82,7 @@ else
                                                         @if (DateTime.Now < v.StartDate)
                                                         {
                                                             <td class="table-status table-primary">
-                                                                시작 전
+                                                                작업 전
                                                             </td>
                                                         }
                                                         else if (v.StartDate < DateTime.Now && DateTime.Now < v.EndDate)
@@ -292,6 +292,7 @@ else
 }
 
 @code {
+    #region 변수들
     [Parameter]
     public int WorkspaceId { get; set; }
 
@@ -330,6 +331,8 @@ else
     AuthenticationState authState;
     ClaimsPrincipal user;
 
+    #endregion
+
     protected override async Task OnInitializedAsync()
     {
         // AuthenticationStateProvider.GetAuthenticationStateAsync() 메서드는
@@ -358,7 +361,7 @@ else
         #endregion
 
         #region WorkspaceUserList
-        workspaceUserList = await WorkspaceUserRepository.GetUsersByWorkspaceId(WorkspaceId);
+        workspaceUserList = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId(WorkspaceId);
         #endregion
 
         #region Work에 할당된 User들
@@ -436,8 +439,8 @@ else
         newWork.CreateUserId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         newWork.ListId = selectedWorkList.Id;
 
-
         await WorkRepository.AddWorkAsync(newWork);
+        await WorkspaceWorkRepository.AddWorkspaceWorkAsync(new WorkspaceWork(newWork.Id, WorkspaceId));
 
         newWork = null;
         isShowAddWorkDialog = false;
@@ -499,6 +502,7 @@ else
 
     private async Task DeleteWorkDialogButton()
     {
+        await WorkspaceWorkRepository.RemoveWorkspaceWorkAsync(selectedWork.Id, WorkspaceId);
         await WorkRepository.DeleteWorkById(selectedWork.Id);
 
         selectedWork = new Work();

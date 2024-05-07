@@ -94,5 +94,7 @@ namespace ProjectAssistant1.Models
         public DbSet<ListWorkspace> ListWorkspace { get; set; }
 
         public DbSet<UserWork> UserWork { get; set; }
+
+        public DbSet<WorkspaceWork> WorkspaceWork { get; set; }
     }
 }

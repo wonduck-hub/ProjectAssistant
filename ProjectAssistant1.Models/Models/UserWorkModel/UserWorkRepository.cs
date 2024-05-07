@@ -35,9 +35,14 @@ namespace ProjectAssistant1.Models.Models.UserWorkModel
             return newUserWork;
         }
 
-        public Task<List<UserWork>> GetUserWorkByUserIdAsync(string userId)
+        public async Task<List<UserWork>> GetUserWorkByUserIdAsync(string userId)
         {
-            throw new NotImplementedException();
+            return await _context.UserWork
+                    .Where(wu => wu.UserId == userId)
+                    .Include(wu => wu.User)
+                    .Include(wu => wu.Work)
+                    .Include(wu => wu.Workspace)
+                    .ToListAsync();
         }
 
         public async Task<List<UserWork>> GetUserWorkByWorkIdAsync(int workId)
@@ -45,6 +50,17 @@ namespace ProjectAssistant1.Models.Models.UserWorkModel
             return await _context.UserWork
                     .Where(wu => wu.WorkId == workId)
                     .Include(wu => wu.User)
+                    .Include(wu => wu.Work)
+                    .Include(wu => wu.Workspace)
+                    .ToListAsync();
+        }
+
+        public async Task<List<UserWork>> GetUserWorkByWorkspaceIdAsync(int workspaceId)
+        {
+            return await _context.UserWork
+                    .Where(wu => wu.WorkspaceId == workspaceId && wu.Workspace.IsDeleted == false)
+                    .Include(wu => wu.User)
+                    .Include(wu => wu.Work)
                     .Include(wu => wu.Workspace)
                     .ToListAsync();
         }
