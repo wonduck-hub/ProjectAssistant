@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Builder;
+Ôªøusing Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -51,12 +51,15 @@ namespace ProjectAssistant1
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
 
+            // Blazor Bootstrap Ï∂îÍ∞Ä
+            services.AddBlazorBootstrap();
+
             // new DbContext
             services.AddEntityFrameworkSqlServer().AddDbContext<ProjectAssistantDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            // DI Containerø° º≠∫ÒΩ∫ µ˚”œ
+            // DI ContainerÔΩøÔΩ° ÔΩºÔΩ≠ÔΩ∫ÓÑ∏ÔΩ∫ ÔΩµÔ®ßÔæè
             services.AddTransient<IWorkspaceRepositoryAsync, WorkspaceRepository>();
             services.AddTransient<IUserWorkspaceRepositoryAsync, UserWorkspaceRepository>();
             services.AddTransient<IUserRepositoryAsync, UserRepository>();
