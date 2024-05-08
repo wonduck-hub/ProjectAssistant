@@ -59,7 +59,7 @@ namespace ProjectAssistant1
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            // DI Containerｿ｡ ｼｭｺｺ ｵ﨧ﾏ
+            // DI Container
             services.AddTransient<IWorkspaceRepositoryAsync, WorkspaceRepository>();
             services.AddTransient<IUserWorkspaceRepositoryAsync, UserWorkspaceRepository>();
             services.AddTransient<IUserRepositoryAsync, UserRepository>();

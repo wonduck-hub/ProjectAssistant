@@ -85,7 +85,7 @@ else
                                                                 작업 전
                                                             </td>
                                                         }
-                                                        else if (v.StartDate < DateTime.Now && DateTime.Now < v.EndDate)
+                                                        else if (v.StartDate <= DateTime.Now && DateTime.Now <= v.EndDate)
                                                         {
                                                             <td class="table-status table-warning">
                                                                 작업 중
