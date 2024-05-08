@@ -56,7 +56,7 @@ else
                             }
                             else
                             {
-                                <table class="table table-striped">
+                                <table class="table">
                                     <thead>
                                         <tr>
                                             <th class="table-name">
@@ -68,7 +68,7 @@ else
                                             <th>기간</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody><!--TODO: 완료 작업 숨기기 기능 추가!!!-->
                                         @foreach (var v in item.Value)
                                         {
                                             @if (!v.IsDeleted)
@@ -80,19 +80,19 @@ else
                                                     {
                                                         @if (DateTime.Now < v.StartDate)
                                                         {
-                                                            <td class="table-status table-primary">
+                                                            <td class="table-status" style="background-color:#c6cdd5;">
                                                                 작업 전
                                                             </td>
                                                         }
                                                         else if (v.StartDate <= DateTime.Now && DateTime.Now <= v.EndDate)
                                                         {
-                                                            <td class="table-status table-warning">
+                                                            <td class="table-status" style=" background-color:#fbc175;">
                                                                 작업 중
                                                             </td>
                                                         }
                                                         else if (v.EndDate < DateTime.Now)
                                                         {
-                                                            <td class="table-status table-danger">
+                                                            <td class="table-status" style=" background-color:#e66a7e;">
                                                                 기간 종료
                                                             </td>
                                                         }
@@ -105,7 +105,7 @@ else
                                                     }
                                                     else
                                                     {
-                                                        <td class="table-success">
+                                                        <td class="table-status" style=" background-color:#49d59c;">
                                                             완료
                                                         </td>
                                                     }
@@ -158,14 +158,14 @@ else
                     <ul class="list-group">
                         @foreach (var u in selectedWorkMemberUserWork)
                         {
-                            <li class="list-group-item list-group-item-action" @onclick="@( () => DeleteWorkMember(u) )">@u.User.UserName</li>
+                            <li class="list-group-item list-group-item-action" @onclick="@( () => DeleteWorkMember(u) )">@u.User.UserName - @u.User.Email</li>
                         }
                     </ul>
                     <label>추가:</label>
                     <ul class="list-group">
                         @foreach (var u in workspaceUserList)
                         {
-                            <li class="list-group-item list-group-item-action" @onclick="@( () => AddWorkMember(u) )">@u.User.UserName</li>
+                            <li class="list-group-item list-group-item-action" @onclick="@( () => AddWorkMember(u) )">@u.User.UserName - @u.User.Email</li>
                         }
                     </ul>
                     <br />

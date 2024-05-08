@@ -13,30 +13,36 @@
 <h3>Dashboard</h3>
 <hr />
 
-@if (workspaceUserList == null || workStatusBarChart == null)
+
+@if (workspaceUserList.Count == 0)
 {
-    <div>로딩중...</div>
-}
-else if (workspaceUserList.Count == 0)
-{
-    <div>포함된 워크스페이스가 없습니다.</div>
+    <div>포함되어 있는 워크스페이스가 없습니다.</div>
 }
 else
 {
-    <select @onchange="OnWorkspaceChanged">
+    <select class="form-select" @onchange="OnWorkspaceChanged">
         @foreach(var item in workspaceUserList)
         {
             <option value="@item.Workspace.Id">@item.Workspace.Name</option>
         }
     </select>
 }
+<br />
 
-<BarChart @ref="workStatusBarChart" Height="300" Class="mb-4" />
+<Card>
+    <CardHeader Style="text-align: center">
+        Status
+    </CardHeader>
+    <CardBody>
+        <BarChart @ref="workStatusBarChart" Style="height: 200px; width: 100%;" Class="mb-4" />
+    </CardBody>
+</Card>
+
 
 @code {
     private List<UserWork> userWorkList = null;
-    private List<WorkspaceUser> workspaceUserList = null;
-    private int selectedWorkspaceId;
+    private List<WorkspaceUser> workspaceUserList = new List<WorkspaceUser>();
+    private int? selectedWorkspaceId = null;
 
     private BarChart workStatusBarChart = null;
     private BarChartOptions workStatusBarChartOptions = default!;
@@ -58,7 +64,10 @@ else
         await LoadDataAsync();
 
         // 차트 설정
-        await SettingWorkStatusBarChart();
+        if (selectedWorkspaceId != null)
+        {
+            await SettingWorkStatusBarChart();
+        }
     }
 
     protected async Task SettingWorkStatusBarChart()
@@ -67,19 +76,19 @@ else
         var labels = new List<string> { "작업 전", "작업 중", "작업 종료", "완료" };
         var datasets = new List<IChartDataset>();
 
-        var tempWorkspaceWorkList = await WorkspaceWorkRepository.GetWorkspaceWorkByWorkspaceIdAsync(selectedWorkspaceId);
+        var tempWorkspaceWorkList = await WorkspaceWorkRepository.GetWorkspaceWorkByWorkspaceIdAsync((int)selectedWorkspaceId);
 
         var dataset1 = new BarChartDataset()
             {
                 Data = new List<double> {0, 0, 0, 0},
-                BackgroundColor = new List<string> { ColorBuilder.CategoricalTwelveColors[1], 
-                                                        ColorBuilder.CategoricalTwelveColors[2], 
-                                                        ColorBuilder.CategoricalTwelveColors[3], 
-                                                        ColorBuilder.CategoricalTwelveColors[0] },
-                BorderColor = new List<string> { ColorBuilder.CategoricalTwelveColors[1],
-                                                    ColorBuilder.CategoricalTwelveColors[2],
-                                                    ColorBuilder.CategoricalTwelveColors[3],
-                                                    ColorBuilder.CategoricalTwelveColors[0] },
+                BackgroundColor = new List<string> { "#c6cdd5",
+                                                        "#fbc175",
+                                                        "#e66a7e",
+                                                        "#49d59c" },
+                BorderColor = new List<string> { "#c6cdd5",
+                                                    "#fbc175",
+                                                    "#e66a7e",
+                                                    "#49d59c" },
                 BorderWidth = new List<double> { 0 },
             };
         foreach(var ww in tempWorkspaceWorkList)
@@ -132,18 +141,28 @@ else
     {
         userWorkList = await UserWorkRepository.GetUserWorkByUserIdAsync(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
         workspaceUserList = await WorkspaceUserRepository.GetWorkspaceUserByUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
-        selectedWorkspaceId = workspaceUserList[0].WorkspaceId;
+
+        if (workspaceUserList.Count > 0)
+        {
+            selectedWorkspaceId = workspaceUserList[0].WorkspaceId;
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await workStatusBarChart.InitializeAsync(workStatusBarChartData, workStatusBarChartOptions);
+            if (selectedWorkspaceId != null)
+            {
+                await workStatusBarChart.InitializeAsync(workStatusBarChartData, workStatusBarChartOptions);
+            }
         }
         else
         {
-            await workStatusBarChart.InitializeAsync(workStatusBarChartData, workStatusBarChartOptions);
+            if (selectedWorkspaceId != null)
+            {
+                await workStatusBarChart.InitializeAsync(workStatusBarChartData, workStatusBarChartOptions);
+            }
         }
         await base.OnAfterRenderAsync(firstRender);
     }
