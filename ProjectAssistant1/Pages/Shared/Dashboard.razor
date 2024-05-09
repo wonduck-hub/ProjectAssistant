@@ -37,11 +37,45 @@ else
         <BarChart @ref="workStatusBarChart" Style="height: 200px; width: 100%;" Class="mb-4" />
     </CardBody>
 </Card>
+<br />
 
+<Card Style="width:18rem; height: 300px;">
+    <CardHeader>
+        Colaboraters
+    </CardHeader>
+    <CardBody Style="overflow-y: auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="table-name">
+                        이름
+                    </th>
+                    <th class="table-status">
+                        이메일
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in selectedWorkspaceUsers)
+                {
+                    <tr>
+                        <td>
+                            @item.User.UserName
+                        </td> 
+                        <td>
+                            @item.User.Email
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </CardBody>
+</Card>
 
 @code {
     private List<UserWork> userWorkList = null;
     private List<WorkspaceUser> workspaceUserList = new List<WorkspaceUser>();
+    private List<WorkspaceUser> selectedWorkspaceUsers = new List<WorkspaceUser>();
     private int? selectedWorkspaceId = null;
 
     private BarChart workStatusBarChart = null;
@@ -145,6 +179,7 @@ else
         if (workspaceUserList.Count > 0)
         {
             selectedWorkspaceId = workspaceUserList[0].WorkspaceId;
+            selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
         }
     }
 
@@ -170,6 +205,8 @@ else
     protected async Task OnWorkspaceChanged(ChangeEventArgs e)
     {
         selectedWorkspaceId = int.Parse(e.Value.ToString());
+        selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
+
         // 선택된 워크스페이스를 사용하는 코드
 
         await SettingWorkStatusBarChart();
