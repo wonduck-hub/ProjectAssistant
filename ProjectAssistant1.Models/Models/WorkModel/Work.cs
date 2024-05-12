@@ -15,6 +15,7 @@ namespace ProjectAssistant1.Models.Models
         public DateTimeOffset? StartDate { get; set; }
         public DateTimeOffset? EndDate { get; set; }
         public bool IsSuccess { get; set; }
+        public DateTimeOffset? SuccessDate { get; set; }
         public string? CreateUserId { get; set; }
         public string? ModifiedUserId { get; set; }
         public string? TaskDetails { get; set; }

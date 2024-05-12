@@ -290,6 +290,12 @@ else
     <div class="modal-backdrop show"></div>
 }
 
+<!--
+    TODO:
+    완료시 완료 시간을 Work테이블에 함께 저장
+    유저 권한 구현
+-->
+
 @code {
     #region 변수들
     [Parameter]
@@ -491,6 +497,15 @@ else
 
     private async Task UpdateWorkDialogButton()
     {
+        if (selectedWork.IsSuccess && selectedWork.SuccessDate == null)
+        {
+            selectedWork.SuccessDate = DateTimeOffset.Now;
+        }
+        else
+        {
+            selectedWork.SuccessDate = null;
+        }
+
         await WorkRepository.UpdateWorkAsync(selectedWork);
 
         selectedWork = new Work();
