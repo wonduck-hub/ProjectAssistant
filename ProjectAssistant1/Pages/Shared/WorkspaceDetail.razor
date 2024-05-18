@@ -33,7 +33,11 @@ else
         {
             <div style="margin-right:10px" @onclick="ShowAddUserDialog">
                 <img src="/images/plus-user.png" width="25" hight="25"/>
-                User
+                Add user
+            </div>
+            <div style="margin-right:10px" @onclick="ShowUsersDialog">
+                <Icon Name="IconName.Wrench" Size="IconSize.x5"/>
+                Users
             </div>
         }
 
@@ -299,7 +303,7 @@ else
                         </div>
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" @bind="searchedUserUserInvitationPermission" />
-                            <label class="form-check-label">초대 권한</label>
+                            <label class="form-check-label">관리자 권한</label>
                         </div>
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" @bind="searchedUserTaskCreationPermission" />
@@ -318,10 +322,49 @@ else
     <div class="modal-backdrop show"></div>
 }
 
+@if (isShowUsersDialog)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Users</h5>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group">
+                        @foreach (var item in workspaceUserList)
+                        {
+                            if (user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value != item.User.Id)
+                            {
+                                <li class="list-group-item list-group-item-action" @onclick="() => SelectUser(item)">@item.User.UserName</li>
+                            }
+                        }
+                    </ul>
+                    @if (selectedWorkspaceUser != null)
+                    {
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" @bind="selectedWorkspaceUser.UserInvitationPermission" />
+                            <label class="form-check-label">관리자 권한</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" @bind="selectedWorkspaceUser.TaskCreationPermission" />
+                            <label class="form-check-label">작업 권한</label>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @onclick="() => SaveUsers(selectedWorkspaceUser)">Save</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseUsersDialog">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
+
 <!--
     TODO:
     완료시 완료 시간을 Work테이블에 함께 저장
-    유저 권한 구현
 -->
 
 @code {
@@ -366,6 +409,12 @@ else
     private List<WorkspaceUser> workspaceUserList = null;
 
     private List<UserWork> selectedWorkMemberUserWork = null;
+
+    #region 유저 설정 저장용
+    private bool isShowUsersDialog = false;
+
+    private WorkspaceUser selectedWorkspaceUser = null;
+    #endregion
 
     AuthenticationState authState;
     ClaimsPrincipal user;
@@ -631,6 +680,29 @@ else
         }
     }
 
+    #endregion
+
+    #region 유저들 권한 설정
+    private void ShowUsersDialog()
+    {
+        isShowUsersDialog = true;
+    }
+
+    private void CloseUsersDialog()
+    {
+        isShowUsersDialog = false;
+    }
+
+    private async Task SaveUsers(WorkspaceUser wu)
+    {
+        await WorkspaceUserRepository.UpdateWorkspaceUserAsync(wu);
+        isShowUsersDialog = false;
+    }
+
+    private void SelectUser(WorkspaceUser wu)
+    {
+        selectedWorkspaceUser = wu;
+    }
     #endregion
     
 }

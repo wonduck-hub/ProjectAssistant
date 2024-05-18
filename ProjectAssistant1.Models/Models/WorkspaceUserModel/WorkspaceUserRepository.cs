@@ -74,9 +74,23 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
             }
         }
 
-        public Task<WorkspaceUser> UpdateWorkspaceUserAsync(WorkspaceUser r)
+        public async Task<WorkspaceUser> UpdateWorkspaceUserAsync(WorkspaceUser r)
         {
-            throw new NotImplementedException();
+            // 업데이트할 WorkspaceUser를 조회합니다.
+            var existingWorkspaceUser = await _context.WorkspaceUser
+                .FirstOrDefaultAsync(wu => wu.Id == r.Id);
+
+            if (existingWorkspaceUser != null)
+            {
+                // 필요한 업데이트 로직을 수행하세요.
+                // 예를 들어, 업데이트할 속성 값을 변경하고 SaveChangesAsync를 호출하세요.
+                existingWorkspaceUser.TaskCreationPermission = r.TaskCreationPermission;
+                existingWorkspaceUser.UserInvitationPermission = r.UserInvitationPermission;
+
+                await _context.SaveChangesAsync();
+            }
+
+            return existingWorkspaceUser;
         }
 
         public async Task<WorkspaceUser> GetWorkspaceUserByWorkspaceIdUserId(string userId, int workspaceId)

@@ -2,6 +2,7 @@
 using ProjectAssistant1.Models.WorkspaceModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
 {
+    [TypeConverter(typeof(WorkspaceUser))]
     public class WorkspaceUser
     {
         public WorkspaceUser() { }
