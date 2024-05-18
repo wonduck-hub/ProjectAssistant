@@ -22,15 +22,29 @@ else
     <h1>@workspace.Name</h1>
 }
 
-<div class="top-row px-4 auth">
-    <div style="margin-right:10px" @onclick="ShowAddUserDialog">
-        <img src="/images/plus-user.png" width="25" hight="25"/>
-        User
-    </div>
-    <button type="button" class="btn btn-primary" @onclick="@ShowAddCategoryDialogButton">Add new category</button>
-</div>
+@if (workspaceUser == null)
+{
+    <div>로딩중...</div>
+}
+else
+{
+    <div class="top-row px-4 auth">
+        @if (workspaceUser.UserInvitationPermission)
+        {
+            <div style="margin-right:10px" @onclick="ShowAddUserDialog">
+                <img src="/images/plus-user.png" width="25" hight="25"/>
+                User
+            </div>
+        }
 
-@if (workListDic == null)
+        @if (workspaceUser.TaskCreationPermission)
+        {
+            <button type="button" class="btn btn-primary" @onclick="@ShowAddCategoryDialogButton">Add new category</button>
+        }
+    </div>
+}
+
+@if (workListDic == null || workspaceUser == null)
 {
     <h4>카테고리가 없습니다.</h4>
 }
@@ -123,7 +137,10 @@ else
                                     </tbody>
                                 </table>
                             }
-                            <input type="button" class="btn btn-primary" value="Add task" @onclick="@( () => ShowAddWorkDialogButton(item.Key) )" />
+                            @if (workspaceUser.TaskCreationPermission)
+                            {
+                                <input type="button" class="btn btn-primary" value="Add task" @onclick="@( () => ShowAddWorkDialogButton(item.Key) )" />
+                            }
                         </div>
                     </div>
                 </section>
@@ -154,25 +171,28 @@ else
                     <br />
                     <textarea @bind="@selectedWork.TaskDetails" rows="5" cols="35" placeholder="Detail..." style="resize:none;"></textarea>
                     <br />
-                    <label>멤버:</label>
-                    <ul class="list-group">
-                        @foreach (var u in selectedWorkMemberUserWork)
-                        {
-                            <li class="list-group-item list-group-item-action" @onclick="@( () => DeleteWorkMember(u) )">@u.User.UserName - @u.User.Email</li>
-                        }
-                    </ul>
-                    <label>추가:</label>
-                    <ul class="list-group">
-                        @foreach (var u in workspaceUserList)
-                        {
-                            <li class="list-group-item list-group-item-action" @onclick="@( () => AddWorkMember(u) )">@u.User.UserName - @u.User.Email</li>
-                        }
-                    </ul>
-                    <br />
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" @bind="selectedWork.IsSuccess" />
-                        <label class="form-check-label" >완료</label>
-                    </div>
+                    @if (workspaceUser.UserInvitationPermission)
+                    {
+                        <label>멤버:</label>
+                        <ul class="list-group">
+                            @foreach (var u in selectedWorkMemberUserWork)
+                            {
+                                <li class="list-group-item list-group-item-action" @onclick="@( () => DeleteWorkMember(u) )">@u.User.UserName - @u.User.Email</li>
+                            }
+                        </ul>
+                        <label>추가:</label>
+                        <ul class="list-group">
+                            @foreach (var u in workspaceUserList)
+                            {
+                                <li class="list-group-item list-group-item-action" @onclick="@( () => AddWorkMember(u) )">@u.User.UserName - @u.User.Email</li>
+                            }
+                        </ul>
+                        <br />
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" @bind="selectedWork.IsSuccess" />
+                            <label class="form-check-label" >완료</label>
+                        </div>
+                    }
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" @onclick="@( () => DeleteWorkDialogButton() )">Delete</button>
@@ -277,6 +297,14 @@ else
                             Name: @searchedUser.UserName <br />
                             Email: @searchedUser.Email<br />
                         </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" @bind="searchedUserUserInvitationPermission" />
+                            <label class="form-check-label">초대 권한</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" @bind="searchedUserTaskCreationPermission" />
+                            <label class="form-check-label">작업 권한</label>
+                        </div>
                     }
                 </div>
                 <div class="modal-footer">
@@ -300,6 +328,8 @@ else
     #region 변수들
     [Parameter]
     public int WorkspaceId { get; set; }
+
+    private WorkspaceUser workspaceUser { get; set; }
 
     private Workspace workspace;
 
@@ -328,6 +358,10 @@ else
     private bool disableDeleteUserButton = true;
 
     private User searchedUser = null;
+
+    private bool searchedUserTaskCreationPermission = false;
+
+    private bool searchedUserUserInvitationPermission = false;
 
     private List<WorkspaceUser> workspaceUserList = null;
 
@@ -372,6 +406,10 @@ else
         #region Work에 할당된 User들
 
         #endregion
+
+
+        workspaceUser = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceIdUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, WorkspaceId);
+
     }
 
     private async Task AddWorkList(MouseEventArgs e)
@@ -553,7 +591,7 @@ else
         Debug.Assert(searchedUser != null);
         Debug.Assert(searchedUser.Id != null);
 
-        WorkspaceUser wu = new WorkspaceUser(searchedUser.Id, WorkspaceId);
+        WorkspaceUser wu = new WorkspaceUser(searchedUser.Id, WorkspaceId, true, false);
         await WorkspaceUserRepository.AddWorkspaceUserAsync(wu);
 
         searchedUser = null;

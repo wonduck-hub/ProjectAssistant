@@ -120,7 +120,7 @@
 
         await WorkspaceRepository.AddWorkspaceAsync(newWorkspace);
 
-        WorkspaceUser newUserWorkspace = new WorkspaceUser(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, newWorkspace.Id);
+        WorkspaceUser newUserWorkspace = new WorkspaceUser(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, newWorkspace.Id, true, true);
 
         await WorkspaceUserRepository.AddWorkspaceUserAsync(newUserWorkspace);
 

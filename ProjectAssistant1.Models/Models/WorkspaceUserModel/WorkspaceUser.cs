@@ -13,10 +13,12 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
     {
         public WorkspaceUser() { }
 
-        public WorkspaceUser(string UserId, int workspaceId)
+        public WorkspaceUser(string UserId, int workspaceId, bool userInvitationPermission, bool taskCreationPermission)
         {
             AspNetUsersId = UserId;
             WorkspaceId = workspaceId;
+            UserInvitationPermission = userInvitationPermission;
+            TaskCreationPermission = taskCreationPermission;
         }
 
         [Key]
@@ -27,6 +29,10 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
 
         [Required]
         public int WorkspaceId { get; set; }
+
+        public bool UserInvitationPermission { get; set; }
+
+        public bool TaskCreationPermission { get; set; }
 
         // Navigation properties
         public User User { get; set; }

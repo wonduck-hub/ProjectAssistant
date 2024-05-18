@@ -78,5 +78,14 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
         {
             throw new NotImplementedException();
         }
+
+        public async Task<WorkspaceUser> GetWorkspaceUserByWorkspaceIdUserId(string userId, int workspaceId)
+        {
+            var workspaceUser = await _context.WorkspaceUser
+                .Where(wu => wu.AspNetUsersId == userId && wu.WorkspaceId == workspaceId)
+                .FirstOrDefaultAsync();
+
+            return workspaceUser;
+        }
     }
 }
