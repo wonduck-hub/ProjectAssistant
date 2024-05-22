@@ -63,6 +63,17 @@ else
                     <div class="card">
                         <div class="card-body">
                             <div class="card-title font-weight-bold d-flex justify-content-between align-items-center">
+                                <!--일부 작업만 보이기 기능-->
+                                <Dropdown>
+                                    <DropdownToggleButton Color="ButtonColor.Primary">표시</DropdownToggleButton>
+                                    <DropdownMenu>
+                                        <DropdownItem Type="ButtonType.Button" @onclick="( () => SetSetWorkVisibility(item.Key, WorkVisibleType.ALL))">전체</DropdownItem>
+                                        <DropdownItem Type="ButtonType.Button" @onclick="( () => SetSetWorkVisibility(item.Key, WorkVisibleType.WORKING))">작업 중</DropdownItem>
+                                        <DropdownItem Type="ButtonType.Button" @onclick="( () => SetSetWorkVisibility(item.Key, WorkVisibleType.BEFORE))">기간 외</DropdownItem>
+                                        <DropdownItem Type="ButtonType.Button" @onclick="( () => SetSetWorkVisibility(item.Key, WorkVisibleType.SUCCESS))">완료</DropdownItem>
+                                        <DropdownItem Type="ButtonType.Button" @onclick="( () => SetSetWorkVisibility(item.Key, WorkVisibleType.TIME_OUT))">미 완료</DropdownItem>
+                                    </DropdownMenu>
+                                </Dropdown>
                                 <input class="category-name" @onchange="@(e => UpdateCategory(e, item.Key))" value="@item.Key.Name"></input>
                                 <img src="/images/trash.png" width="20" hight="20" @onclick="@( () => DeleteCategoryButton(item.Key) )"></img>
                             </div>
@@ -86,47 +97,80 @@ else
                                             <th>기간</th>
                                         </tr>
                                     </thead>
-                                    <tbody><!--TODO: 완료 작업 숨기기 기능 추가!!!-->
+                                    <tbody>
                                         @foreach (var v in item.Value)
                                         {
+                                            
                                             @if (!v.IsDeleted)
                                             {
-                                                <tr @onclick="@( () => ShowWorkDetail(v) )">
-                                                    <td class="table-name">@v.Name</td>
-                                                    
-                                                    @if (!v.IsSuccess)
+                                                workStatus = "오류";
+                                                workColor = "#ffffff";
+
+                                                @if (v.IsSuccess)
+                                                {
+                                                    @if (workVisible[item.Key] == WorkVisibleType.SUCCESS
+                                                   || workVisible[item.Key] == WorkVisibleType.ALL)
                                                     {
-                                                        @if (DateTime.Now < v.StartDate)
-                                                        {
-                                                            <td class="table-status" style="background-color:#c6cdd5;">
-                                                                작업 전
-                                                            </td>
-                                                        }
-                                                        else if (v.StartDate <= DateTime.Now && DateTime.Now <= v.EndDate)
-                                                        {
-                                                            <td class="table-status" style=" background-color:#fbc175;">
-                                                                작업 중
-                                                            </td>
-                                                        }
-                                                        else if (v.EndDate < DateTime.Now)
-                                                        {
-                                                            <td class="table-status" style=" background-color:#e66a7e;">
-                                                                기간 종료
-                                                            </td>
-                                                        }
-                                                        else
-                                                        {
-                                                            <td class="table-status">
-                                                                오류
-                                                            </td>
-                                                        }
+                                                        workStatus = "완료";
+                                                        workColor = "#49d59c";
                                                     }
                                                     else
                                                     {
-                                                        <td class="table-status" style=" background-color:#49d59c;">
-                                                            완료
-                                                        </td>
+                                                        continue;
                                                     }
+                                                }
+                                                else if (DateTime.Now < v.StartDate)
+                                                {
+                                                    @if (workVisible[item.Key] == WorkVisibleType.BEFORE
+                                                    || workVisible[item.Key] == WorkVisibleType.ALL)
+                                                    {
+                                                        workStatus = "작업 전";
+                                                        workColor = "#c6cdd5";
+                                                    }
+                                                    else
+                                                    {
+                                                        continue;
+                                                    }
+                                                }
+                                                else if (v.StartDate <= DateTime.Now && DateTime.Now <= v.EndDate)
+                                                {
+                                                    @if (workVisible[item.Key] == WorkVisibleType.WORKING
+                                                    || workVisible[item.Key] == WorkVisibleType.ALL)
+                                                    {
+                                                        workStatus = "작업 중";
+                                                        workColor = "#fbc175";
+                                                    }
+                                                    else
+                                                    {
+                                                        continue;
+                                                    }
+                                                }
+                                                else if (v.EndDate < DateTime.Now)
+                                                {
+                                                    @if (workVisible[item.Key] == WorkVisibleType.TIME_OUT
+                                                    || workVisible[item.Key] == WorkVisibleType.ALL)
+                                                    {
+                                                        workStatus = "기간 종료";
+                                                        workColor = "#e66a7e";
+                                                    }
+                                                    else
+                                                    {
+                                                        continue;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    workStatus = "오류";
+                                                    workColor = "#ffffff";
+                                                }
+
+                                                
+
+                                                <tr @onclick="@( () => ShowWorkDetail(v) )">
+                                                    <td class="table-name">@v.Name</td>
+                                                    <td class="table-status" style="background-color:@workColor;">
+                                                        @workStatus
+                                                    </td>
                                                     @if (v.StartDate.HasValue && v.EndDate.HasValue)
                                                     {
                                                         <td>@v.StartDate.Value.ToString("yyyy/MM/dd") ~ @v.EndDate.Value.ToString("yyyy/MM/dd")</td>
@@ -149,6 +193,7 @@ else
                     </div>
                 </section>
             </div>
+
         }
     }
 }
@@ -368,6 +413,15 @@ else
 -->
 
 @code {
+    enum WorkVisibleType
+    {
+        ALL = 0,
+        WORKING = 1,
+        BEFORE = 2,
+        SUCCESS = 3,
+        TIME_OUT = 4,
+    };
+
     #region 변수들
     [Parameter]
     public int WorkspaceId { get; set; }
@@ -387,6 +441,8 @@ else
     private WorkList selectedWorkList = null;
 
     private Dictionary<WorkList, List<Work>> workListDic = new Dictionary<WorkList, List<Work>>();
+
+    List<WorkList> tempWorkLists = null;
 
     private bool isShowDeleteWorkspaceDialog = false;
 
@@ -409,12 +465,20 @@ else
     private List<WorkspaceUser> workspaceUserList = null;
 
     private List<UserWork> selectedWorkMemberUserWork = null;
+    #endregion
+
+    #region 표시 임시 변수들
+    private string workStatus = null;
+
+    private string workColor = null;
+
+    private Dictionary<WorkList, WorkVisibleType> workVisible;
+    #endregion
 
     #region 유저 설정 저장용
     private bool isShowUsersDialog = false;
 
     private WorkspaceUser selectedWorkspaceUser = null;
-    #endregion
 
     AuthenticationState authState;
     ClaimsPrincipal user;
@@ -437,25 +501,21 @@ else
     {
         #region WorkListDic
         workListDic = new Dictionary<WorkList, List<Work>>();
+        workVisible = new Dictionary<WorkList, WorkVisibleType>();
 
-        List<WorkList> tempWorkLists = null;
         tempWorkLists = await WorkListRepository.GetWorkListsByWorkspaceIdAsync(workspace.Id);
 
         foreach (var item in tempWorkLists)
         {
             List<Work> tempWorks = await WorkRepository.GetWorkByListIdAsync(item.Id);
             workListDic.Add(item, tempWorks);
+            workVisible.Add(item, WorkVisibleType.ALL);
         }
         #endregion
 
         #region WorkspaceUserList
         workspaceUserList = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId(WorkspaceId);
         #endregion
-
-        #region Work에 할당된 User들
-
-        #endregion
-
 
         workspaceUser = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceIdUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, WorkspaceId);
 
@@ -475,6 +535,11 @@ else
         isShowAddCategoryDialog = false;
 
         await ReloadData();
+    }
+
+    private void SetSetWorkVisibility(WorkList w, WorkVisibleType v)
+    {
+        workVisible[w] = v;
     }
 
     #region 작업에 유저 할당
@@ -704,5 +769,5 @@ else
         selectedWorkspaceUser = wu;
     }
     #endregion
-    
+
 }
