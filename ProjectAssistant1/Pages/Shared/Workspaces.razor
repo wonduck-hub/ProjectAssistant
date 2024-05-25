@@ -90,6 +90,12 @@
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         user = authState.User;
 
+        if (!user.Identity.IsAuthenticated)
+        {
+            // 로그인 안된 상태
+            NavigationManager.NavigateTo("Identity/Account/Login");
+        }
+
         await ReloadWorkspaces();
     }
 
