@@ -57,17 +57,33 @@ else
                             <th class="table-status">
                                 이메일
                             </th>
+                            <th class="table-status">
+                                완료 작업 수
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in selectedWorkspaceUsers)
                         {
+                            int successCount = 0;
+
+                            foreach (var w in userWorkList)
+                            {
+                                if (w.User.Id == item.User.Id && w.Work.IsSuccess && !w.Work.IsDeleted)
+                                {
+                                    ++successCount;
+                                }
+                            }
+
                             <tr>
                                 <td>
                                     @item.User.UserName
                                 </td> 
                                 <td>
                                     @item.User.Email
+                                </td>
+                                <td style="text-align: center">
+                                    @successCount
                                 </td>
                             </tr>
                         }
@@ -299,13 +315,13 @@ else
 
     protected async Task LoadDataAsync()
     {
-        userWorkList = await UserWorkRepository.GetUserWorkByUserIdAsync(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
         workspaceUserList = await WorkspaceUserRepository.GetWorkspaceUserByUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
-
         if (workspaceUserList.Count > 0)
         {
             selectedWorkspaceId = workspaceUserList[0].WorkspaceId;
             selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
+
+            userWorkList = await UserWorkRepository.GetUserWorkByWorkspaceIdAsync((int)selectedWorkspaceId);
         }
     }
 

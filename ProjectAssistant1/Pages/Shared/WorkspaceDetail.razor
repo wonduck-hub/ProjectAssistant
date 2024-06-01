@@ -74,7 +74,7 @@ else
                                         <DropdownItem Type="ButtonType.Button" @onclick="( () => SetSetWorkVisibility(item.Key, WorkVisibleType.TIME_OUT))">미 완료</DropdownItem>
                                     </DropdownMenu>
                                 </Dropdown>
-                                <input class="category-name" @onchange="@(e => UpdateCategory(e, item.Key))" value="@item.Key.Name"></input>
+                                <input class="category-name" @onchange="@(e => UpdateCategory(e, item.Key))" value="@item.Key.Name" style="text-align: center;"></input>
                                 <img src="/images/trash.png" width="20" hight="20" @onclick="@( () => DeleteCategoryButton(item.Key) )"></img>
                             </div>
                             
