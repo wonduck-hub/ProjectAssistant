@@ -24,6 +24,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using ProjectAssistant1.Hubs;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace ProjectAssistant1
 {
@@ -69,6 +72,14 @@ namespace ProjectAssistant1
             services.AddTransient<IUserWorkRepository, UserWorkRepository>();
             services.AddTransient<IWorkListRepository,  WorkListRepository>();
             services.AddTransient<IWorkspaceWorkRepository, WorkspaceWorkRepository>();
+
+            // SignalR 
+            services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -99,6 +110,14 @@ namespace ProjectAssistant1
                 endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
+            });
+
+            // SignalR
+            app.UseResponseCompression();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<ChatHub>("/chathub");
             });
         }
     }
