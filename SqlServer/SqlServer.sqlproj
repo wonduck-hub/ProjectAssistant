@@ -164,5 +164,6 @@
     <Build Include="dbo\Tables\WorkspaceUser.sql" />
     <Build Include="dbo\Tables\WorkspaceWork.sql" />
     <Build Include="dbo\Tables\Chats.sql" />
+    <Build Include="dbo\Tables\ChatRooms.sql" />
   </ItemGroup>
 </Project>

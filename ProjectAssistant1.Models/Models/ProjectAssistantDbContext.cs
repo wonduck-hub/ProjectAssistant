@@ -9,6 +9,8 @@ using ProjectAssistant1.Models.Models.ListModel;
 using ProjectAssistant1.Models.Models;
 using ProjectAssistant1.Models.Models.UserWorkModel;
 using ProjectAssistant1.Models.Models.WorkspaceWorkModel;
+using ProjectAssistant1.Models.Models.ChatModel;
+using ProjectAssistant1.Models.Models.ChatRoomModel;
 
 namespace ProjectAssistant1.Models
 {
@@ -74,7 +76,6 @@ namespace ProjectAssistant1.Models
                 .HasOne(uw => uw.Workspace)
                 .WithMany(w => w.UserWorks)
                 .HasForeignKey(uw => uw.WorkspaceId);
-
         }
 
 
@@ -96,5 +97,9 @@ namespace ProjectAssistant1.Models
         public DbSet<UserWork> UserWork { get; set; }
 
         public DbSet<WorkspaceWork> WorkspaceWork { get; set; }
+
+        public DbSet<ChatRoom> ChatRooms { get; set; }
+
+        public DbSet<Chat> Chats { get; set; }
     }
 }

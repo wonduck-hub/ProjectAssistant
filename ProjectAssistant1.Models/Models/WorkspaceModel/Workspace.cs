@@ -1,4 +1,5 @@
-﻿using ProjectAssistant1.Models.Models.UserWorkModel;
+﻿using ProjectAssistant1.Models.Models.ChatRoomModel;
+using ProjectAssistant1.Models.Models.UserWorkModel;
 using ProjectAssistant1.Models.Models.WorkspaceUserModel;
 using ProjectAssistant1.Models.Models.WorkspaceWorkModel;
 using System;
@@ -22,5 +23,6 @@ namespace ProjectAssistant1.Models.WorkspaceModel
         public IEnumerable<WorkspaceUser> WorkspaceUsers { get; set; }
         public IEnumerable<WorkspaceWork> WorkspaceWorks { get; set; }
         public IEnumerable<UserWork> UserWorks { get; set; }
+        public virtual ICollection<ChatRoom> ChatRooms { get; set; }
     }
 }

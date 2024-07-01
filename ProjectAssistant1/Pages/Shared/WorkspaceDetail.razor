@@ -488,10 +488,10 @@ else
 
     private WorkspaceUser selectedWorkspaceUser = null;
 
+    #endregion
+
     AuthenticationState authState;
     ClaimsPrincipal user;
-
-    #endregion
 
     protected override async Task OnInitializedAsync()
     {
@@ -502,7 +502,7 @@ else
 
         if (!user.Identity.IsAuthenticated)
         {
-            // 로그인 안된 상태
+            // 로그인 안된 경우
             NavigationManager.NavigateTo("Identity/Account/Login");
         }
 
