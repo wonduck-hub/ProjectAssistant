@@ -28,6 +28,9 @@ else
 }
 
 @code {
+    public bool IsConnected =>
+        hubConnection.State == HubConnectionState.Connected;
+
     private HubConnection hubConnection; // SignalR 허브 연결용
     private List<string> messages = new List<string>();
     private string userInput;
@@ -98,7 +101,4 @@ else
     //     await Clients.Users(userIds).SendAsync("ReceiveMessage", message);
     // }
 
-
-    public bool IsConnected =>
-        hubConnection.State == HubConnectionState.Connected;
 }

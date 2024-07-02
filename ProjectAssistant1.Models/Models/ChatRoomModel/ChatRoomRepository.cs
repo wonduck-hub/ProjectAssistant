@@ -28,6 +28,11 @@ namespace ProjectAssistant1.Models.Models.ChatRoomModel
             throw new NotImplementedException();
         }
 
+        public Task<List<ChatRoom>> GetChatRoomByWorkspaceId(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<ChatRoom>> GetChatRoomsAsync()
         {
             throw new NotImplementedException();

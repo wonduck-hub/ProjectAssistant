@@ -12,6 +12,7 @@ namespace ProjectAssistant1.Models.Models.ChatModel
         Task<List<Chat>> GetChatsAsync();
         Task<Chat> GetChatByIdAsync(int id);
         Task<List<Chat>> GetChatByCreateUserId(string userId);
+        Task<List<Chat>> GetChatByCreateChatRoomId(int id);
         Task<Chat> UpdateChatAsync(Chat c);
         Task DeleteChatById(int id);
         Task RemoveChatAsync(int id);
