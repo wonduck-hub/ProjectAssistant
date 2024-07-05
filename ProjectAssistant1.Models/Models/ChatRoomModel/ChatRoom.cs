@@ -15,6 +15,7 @@ namespace ProjectAssistant1.Models.Models.ChatRoomModel
         public DateTimeOffset? Created { get; set; }
         public DateTimeOffset? Modified { get; set; }
         public bool IsDeleted { get; set; }
+        public bool IsDefault { get; set; }
         public bool IsNotification { get; set; }
 
         // Foreign key for Workspace

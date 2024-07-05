@@ -27,6 +27,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using ProjectAssistant1.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
+using ProjectAssistant1.Models.Models.ChatRoomModel;
+using ProjectAssistant1.Models.Models.ChatModel;
 
 namespace ProjectAssistant1
 {
@@ -72,6 +74,8 @@ namespace ProjectAssistant1
             services.AddTransient<IUserWorkRepository, UserWorkRepository>();
             services.AddTransient<IWorkListRepository,  WorkListRepository>();
             services.AddTransient<IWorkspaceWorkRepository, WorkspaceWorkRepository>();
+            services.AddTransient<IChatRoomRepository, ChatRoomRepository>();
+            services.AddTransient<IChatRepository, ChatRepository>();
 
             // SignalR 
             services.AddResponseCompression(opts =>

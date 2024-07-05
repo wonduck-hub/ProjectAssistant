@@ -18,6 +18,11 @@ namespace ProjectAssistant1.Models.Models.ChatModel
             throw new NotImplementedException();
         }
 
+        public Task<List<Chat>> GetChatByCreateChatRoomId(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<Chat>> GetChatByCreateUserId(string userId)
         {
             throw new NotImplementedException();
