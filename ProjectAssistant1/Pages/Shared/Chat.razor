@@ -169,10 +169,17 @@ else
 
         await hubConnection.StartAsync();
 
-        await LoadDataAsync();
+        await LoadWorkspaceUserAsync();
     }
 
-    protected async Task LoadDataAsync()
+    protected async Task OnWorkspaceChanged(ChangeEventArgs e)
+    {
+        selectedWorkspaceId = int.Parse(e.Value.ToString());
+        selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
+        await LoadChatServiceAsync();
+    }
+
+    protected async Task LoadWorkspaceUserAsync()
     {
         workspaceUserList = await WorkspaceUserRepository.GetWorkspaceUserByUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
         if (workspaceUserList.Count > 0)
@@ -180,13 +187,12 @@ else
             selectedWorkspaceId = workspaceUserList[0].WorkspaceId;
             selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
         }
+
+        await LoadChatServiceAsync();
     }
 
-    protected async Task OnWorkspaceChanged(ChangeEventArgs e)
+    protected async Task LoadChatServiceAsync()
     {
-        selectedWorkspaceId = int.Parse(e.Value.ToString());
-        selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
-
         // 선택된 워크스페이스를 사용하는 코드
         chatRoomList = await ChatRoomRepository.GetChatRoomByWorkspaceId(selectedWorkspaceId);
     }

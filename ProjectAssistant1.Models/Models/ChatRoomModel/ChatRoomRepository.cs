@@ -18,9 +18,14 @@ namespace ProjectAssistant1.Models.Models.ChatRoomModel
             this._context = context;
         }
 
-        public Task<ChatRoom> AddChatRoomAsync(ChatRoom cr)
+        public async Task<ChatRoom> AddChatRoomAsync(ChatRoom cr)
         {
-            throw new NotImplementedException();
+            Debug.Assert(cr != null, "ChatRoom is null");
+
+            this._context.ChatRooms.Add(cr);
+            await _context.SaveChangesAsync();
+
+            return cr;
         }
 
         public Task DeleteChatRoomById(int id)

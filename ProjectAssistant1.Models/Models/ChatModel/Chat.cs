@@ -20,5 +20,11 @@ namespace ProjectAssistant1.Models.Models.ChatModel
 
         // Navigation property for the ChatRoom foreign key
         public ChatRoom ChatRoom { get; set; }
+
+        
+        public Chat(string text)
+        {
+            this.Text = text;
+        }
     }
 }

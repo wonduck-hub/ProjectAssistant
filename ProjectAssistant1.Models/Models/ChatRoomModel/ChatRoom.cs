@@ -24,5 +24,15 @@ namespace ProjectAssistant1.Models.Models.ChatRoomModel
         // Navigation property for the Workspace foreign key
         public virtual Workspace Workspace { get; set; }
         public virtual ICollection<Chat> Chats { get; set; }
+
+
+        public ChatRoom() { }
+
+        public ChatRoom(int workspaceId, string name, DateTimeOffset? d)
+        {
+            this.WorkspaceId = workspaceId;
+            this.Name = name;
+            this.Created = d;
+        }
     }
 }

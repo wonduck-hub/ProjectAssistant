@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[ChatRooms]
 (
-	[Id] INT NOT NULL PRIMARY KEY,
+	[Id] INT IDENTITY (1, 1) NOT NULL PRIMARY KEY,
 	[Name] NVARCHAR(255) NOT NULL,
 	[Created] DATETIMEOFFSET (7) DEFAULT ((sysdatetimeoffset() AT TIME ZONE 'Korea Standard Time')) NULL,
 	[Modified] DATETIMEOFFSET (7) NULL,

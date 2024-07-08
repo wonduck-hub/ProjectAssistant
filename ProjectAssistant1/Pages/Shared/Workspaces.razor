@@ -3,6 +3,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IWorkspaceRepositoryAsync WorkspaceRepository
 @inject IWorkspaceUserRepository WorkspaceUserRepository
+@inject IChatRoomRepository ChatRoomRepository
 @inject NavigationManager NavigationManager
 
 <h1>Your workspaces</h1>
@@ -129,6 +130,10 @@
         WorkspaceUser newUserWorkspace = new WorkspaceUser(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, newWorkspace.Id, true, true);
 
         await WorkspaceUserRepository.AddWorkspaceUserAsync(newUserWorkspace);
+
+        // 기본 채팅방 생성
+        DateTimeOffset? now = DateTimeOffset.Now;
+        await ChatRoomRepository.AddChatRoomAsync(new ChatRoom(newWorkspace.Id, "General", now));
 
         newWorkspace = new Workspace();
         isShowDialog = false;
