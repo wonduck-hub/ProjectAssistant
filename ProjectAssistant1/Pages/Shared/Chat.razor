@@ -79,7 +79,7 @@ else
                                 @foreach(var chatRoom in chatRoomList)
                                 {
                                     <li class="p-2 border-bottom bg-body-tertiary">
-                                        <div class="d-flex flex-row">
+                                        <div class="d-flex flex-row" style="align-items:center;">
                                             <div class="pt-1">
                                                 <p class="fw-bold mb-0"><Icon Name="IconName.ChatLeftDots"></Icon> @chatRoom.Name</p>
                                                 @* <p class="small text-muted">Hello, Are you there?</p> *@
@@ -96,6 +96,7 @@ else
 
                     </div>
                 </div>
+                <hr />
                 <!--유저 리스트-->
                 <h5 class="font-weight-bold mb-3 text-center text-lg-start">users</h5>
                 <div class="card">
@@ -106,10 +107,9 @@ else
                                 <a href="#!" class="d-flex justify-content-between">
                                     <div class="d-flex flex-row">
                                         <img src="/images/default-user-icon.png" alt="avatar"
-                                             class="rounded-circle d-flex align-self-center me-3 shadow-1-strong" width="60">
-                                        <div class="pt-1">
+                                             class="rounded-circle d-flex align-self-center me-3 shadow-1-strong" width="40">
+                                        <div class="pt-1" style="text-align:center">
                                             <p class="fw-bold mb-0">John Doe</p>
-                                            <p class="small text-muted">Hello, Are you there?</p>
                                         </div>
                                     </div>
                                     <div class="pt-1">

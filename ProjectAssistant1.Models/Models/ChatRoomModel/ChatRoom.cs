@@ -28,11 +28,12 @@ namespace ProjectAssistant1.Models.Models.ChatRoomModel
 
         public ChatRoom() { }
 
-        public ChatRoom(int workspaceId, string name, DateTimeOffset? d)
+        public ChatRoom(int workspaceId, string name, DateTimeOffset? d, bool isDefault)
         {
             this.WorkspaceId = workspaceId;
             this.Name = name;
             this.Created = d;
+            this.IsDefault = isDefault;
         }
     }
 }

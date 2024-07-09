@@ -133,7 +133,7 @@
 
         // 기본 채팅방 생성
         DateTimeOffset? now = DateTimeOffset.Now;
-        await ChatRoomRepository.AddChatRoomAsync(new ChatRoom(newWorkspace.Id, "General", now));
+        await ChatRoomRepository.AddChatRoomAsync(new ChatRoom(newWorkspace.Id, "General", now, true));
 
         newWorkspace = new Workspace();
         isShowDialog = false;
