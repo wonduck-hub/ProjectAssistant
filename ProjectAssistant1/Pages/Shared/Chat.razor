@@ -14,133 +14,187 @@
 <hr />
 <br />
 
-@if (workspaceUserList.Count == 0)
+@if (workspaceUserList == null)
+{
+    <div>로딩중...</div>
+}
+else if(workspaceUserList.Count == 0)
 {
     <div>포함되어 있는 워크스페이스가 없습니다.</div>
 }
 else
 {
-    <select class="form-select" @onchange="OnWorkspaceChanged">
-        @foreach (var item in workspaceUserList)
-        {
-            <option value="@item.Workspace.Id">@item.Workspace.Name</option>
-        }
-    </select>
-}
-<hr />
+    @if (workspaceUser == null)
+    {
+        <div>로딩중...</div>
+    }
+    else
+    {
+        <select class="form-select" @onchange="OnWorkspaceChanged">
+            @foreach (var item in workspaceUserList)
+            {
+                <option value="@item.Workspace.Id">@item.Workspace.Name</option>
+            }
+        </select>
 
-<!--디스코드 비슷한 UI 구현-->
-<section>
-    <div class="container py-5">
+        <!--ChatRoom 추가 삭제 버튼-->
+        <div class="top-row px-4 auth">
+            @if (workspaceUser.TaskCreationPermission)
+            {
+                <button type="button" class="btn btn-primary" style="margin-right:10px" @onclick="ShowAddChatRoomDialogButton">Add new ChatRoom</button>
+                <button type="button" class="btn btn-danger">Delete ChatRoom</button>
+            }
+        </div>
+    }
 
-        <div class="row">
+    <hr />
 
-            <!--채팅 리스트-->
-            <div class="col-md-6 col-lg-7 col-xl-8" >
+    <section>
+        <div class="container py-5">
 
-                <ul class="list-unstyled">
-                    <li class="d-flex justify-content-between mb-4">
-                        <img src="/images/default-user-icon.png" alt="avatar"
-                             class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="60">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between p-3">
-                                <p class="fw-bold mb-0">Brad Pitt</p>
-                                <p class="text-muted small mb-0"><i class="far fa-clock"></i> 12 mins ago</p>
+            <div class="row">
+
+                <!--채팅 리스트-->
+                <div class="col-md-6 col-lg-7 col-xl-8" >
+
+                    <ul class="list-unstyled">
+                        <li class="d-flex justify-content-between mb-4">
+                            <img src="/images/default-user-icon.png" alt="avatar"
+                                 class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="60">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between p-3">
+                                    <p class="fw-bold mb-0">Brad Pitt</p>
+                                    <p class="text-muted small mb-0"><i class="far fa-clock"></i> 12 mins ago</p>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-0">
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                                        labore et dolore magna aliqua.
+                                    </p>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <p class="mb-0">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                                    labore et dolore magna aliqua.
-                                </p>
+                        </li>
+                        <li class="bg-white mb-3">
+                            <div data-mdb-input-init class="form-outline">
+                                <textarea class="form-control bg-body-tertiary" id="textAreaExample2" rows="4"></textarea>
+                                <label class="form-label" for="textAreaExample2">Message</label>
                             </div>
+                        </li>
+                        <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-rounded float-end">Send</button>
+                    </ul>
+
+                </div>
+
+                <!--사이드 리스트(채팅방과 유저 리스트 표시)-->
+                <div class="col-md-6 col-lg-5 col-xl-4 mb-4 mb-md-0">
+                    <!--채팅방 리스트-->
+                    <h5 class="font-weight-bold mb-3 text-center text-lg-start">chat rooms</h5>
+                    <div class="card">
+                        <div class="card-body">
+
+                            <ul class="list-unstyled mb-0">
+                                @if (chatRoomList != null)
+                                {
+                                    @foreach(var chatRoom in chatRoomList)
+                                    {
+                                        <li class="p-2 border-bottom bg-body-tertiary">
+                                            <div class="d-flex flex-row" style="align-items:center;">
+                                                <div class="pt-1">
+                                                    <p class="fw-bold mb-0"><Icon Name="IconName.ChatLeftDots"></Icon> @chatRoom.Name</p>
+                                                    @* <p class="small text-muted">Hello, Are you there?</p> *@
+                                                </div>
+                                            </div>
+                                            @* <div class="pt-1">
+                                                <p class="small text-muted mb-1">Just now</p>
+                                                <span class="badge bg-danger float-end">1</span>
+                                            </div> *@
+                                        </li>
+                                    }
+                                }
+                            </ul>
+
                         </div>
-                    </li>
-                    <li class="bg-white mb-3">
-                        <div data-mdb-input-init class="form-outline">
-                            <textarea class="form-control bg-body-tertiary" id="textAreaExample2" rows="4"></textarea>
-                            <label class="form-label" for="textAreaExample2">Message</label>
-                        </div>
-                    </li>
-                    <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-rounded float-end">Send</button>
-                </ul>
+                    </div>
+                    <br />
+                    <!--유저 리스트-->
+                    <h5 class="font-weight-bold mb-3 text-center text-lg-start">users</h5>
+                    <div class="card">
+                        <div class="card-body">
 
-            </div>
-
-            <!--사이드 리스트(채팅방과 유저 리스트 표시)-->
-            <div class="col-md-6 col-lg-5 col-xl-4 mb-4 mb-md-0">
-                <!--채팅방 리스트-->
-                <h5 class="font-weight-bold mb-3 text-center text-lg-start">chat rooms</h5>
-                <div class="card">
-                    <div class="card-body">
-
-                        <ul class="list-unstyled mb-0">
-                            @if (chatRoomList != null)
-                            {
-                                @foreach(var chatRoom in chatRoomList)
+                            <ul class="list-unstyled mb-0">
+                                @foreach(var workspaceUser in selectedWorkspaceUsers)
                                 {
                                     <li class="p-2 border-bottom bg-body-tertiary">
-                                        <div class="d-flex flex-row" style="align-items:center;">
-                                            <div class="pt-1">
-                                                <p class="fw-bold mb-0"><Icon Name="IconName.ChatLeftDots"></Icon> @chatRoom.Name</p>
-                                                @* <p class="small text-muted">Hello, Are you there?</p> *@
+                                        <div class="d-flex flex-row">
+                                            <img src="/images/default-user-icon.png" alt="avatar"
+                                                    class="rounded-circle d-flex align-self-center me-3 shadow-1-strong" width="25">
+                                            <div class="pt-1" style="text-align:center">
+                                                <p class="fw-bold mb-0">@workspaceUser.User.UserName</p>
                                             </div>
                                         </div>
-                                        @* <div class="pt-1">
-                                            <p class="small text-muted mb-1">Just now</p>
-                                            <span class="badge bg-danger float-end">1</span>
-                                        </div> *@
                                     </li>
                                 }
-                            }
-                        </ul>
-
-                    </div>
-                </div>
-                <br />
-                <!--유저 리스트-->
-                <h5 class="font-weight-bold mb-3 text-center text-lg-start">users</h5>
-                <div class="card">
-                    <div class="card-body">
-
-                        <ul class="list-unstyled mb-0">
-                            @foreach(var workspaceUser in selectedWorkspaceUsers)
-                            {
-                                <li class="p-2 border-bottom bg-body-tertiary">
-                                    <div class="d-flex flex-row">
-                                        <img src="/images/default-user-icon.png" alt="avatar"
-                                                class="rounded-circle d-flex align-self-center me-3 shadow-1-strong" width="25">
-                                        <div class="pt-1" style="text-align:center">
-                                            <p class="fw-bold mb-0">@workspaceUser.User.UserName</p>
-                                        </div>
-                                    </div>
-                                </li>
-                            }
                             
-                        </ul>
+                            </ul>
 
+                        </div>
                     </div>
                 </div>
+
             </div>
 
         </div>
+    </section>
 
-    </div>
-</section>
+    @if (isShowAddChatRoomDialog)
+    {
+        <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detail</h5>
+                    </div>
+                    <div class="modal-body">
+                        <label>이름:</label>
+                        <input type="text" @bind="@newChatRoom.Name" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" @onclick="AddChatRoomDialogButton">Save</button>
+                        <button type="button" class="btn btn-secondary" @onclick="CloseWorkDetailDialogButton">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop show"></div>
+    }
+}
+
+
 
 @code {
     public bool IsConnected =>
         hubConnection.State == HubConnectionState.Connected;
 
+    private WorkspaceUser workspaceUser = null; // 현재 사용자의 워크스페이스 사용자 정보
+
     private HubConnection hubConnection; // SignalR 허브 연결용
     private List<string> messages = new List<string>();
     private string userInput;
 
-    private List<WorkspaceUser> workspaceUserList = new List<WorkspaceUser>();
+    private List<WorkspaceUser> workspaceUserList = null;
     private List<WorkspaceUser> selectedWorkspaceUsers = new List<WorkspaceUser>();
-    private int? selectedWorkspaceId = null;
+    private int selectedWorkspaceId = -1;
+    private ChatRoom selectecChatRoom = null;
 
     private List<ChatRoom> chatRoomList = null;
     private List<Chat> chats = null;
+
+    #region 챗룸 추가 삭제 속성
+    private bool isShowAddChatRoomDialog = false;
+
+    private ChatRoom newChatRoom = new ChatRoom();
+
+    #endregion
 
     AuthenticationState authState;
     ClaimsPrincipal user;
@@ -179,6 +233,7 @@ else
     {
         selectedWorkspaceId = int.Parse(e.Value.ToString());
         selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
+
         await LoadChatServiceAsync();
     }
 
@@ -191,6 +246,9 @@ else
             selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
         }
 
+        workspaceUser = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceIdUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, selectedWorkspaceId);
+
+
         await LoadChatServiceAsync();
     }
 
@@ -199,6 +257,37 @@ else
         // 선택된 워크스페이스를 사용하는 코드
         chatRoomList = await ChatRoomRepository.GetChatRoomByWorkspaceId(selectedWorkspaceId);
     }
+
+    #region 챗룸 추가 삭제 함수
+    protected void ShowAddChatRoomDialogButton()
+    {
+        isShowAddChatRoomDialog = true;
+    }
+
+    protected async Task AddChatRoomDialogButton()
+    {
+        if (    newChatRoom.Name == null)
+        {
+            newChatRoom.Name = "미정";
+        }
+        newChatRoom.WorkspaceId = selectedWorkspaceId;
+        newChatRoom.IsDefault = false;
+        await ChatRoomRepository.AddChatRoomAsync(newChatRoom);
+        
+        // 왜 안닫히는지 모름
+        // 나중에 확인
+        newChatRoom = new ChatRoom();
+        isShowAddChatRoomDialog = false;
+
+        await LoadChatServiceAsync();
+    }
+
+    protected void CloseWorkDetailDialogButton()
+    {
+        newChatRoom = new ChatRoom();
+        isShowAddChatRoomDialog = false;
+    }
+    #endregion
 
     Task SendMessage()
     {
