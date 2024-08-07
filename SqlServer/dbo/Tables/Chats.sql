@@ -7,5 +7,7 @@
 	[IsDeleted]      BIT                NOT NULL DEFAULT 0,
 	[IsNotification]      BIT                NOT NULL DEFAULT 0,
 	[ChatRoomId] INT NOT NULL,
+	[UserId] NVARCHAR (450) NOT NULL,
 	FOREIGN KEY (ChatRoomId) REFERENCES ChatRooms(Id),
+	FOREIGN KEY (UserId) REFERENCES AspNetUsers(Id)
 )

@@ -41,7 +41,8 @@ else
         <div class="top-row px-4 auth">
             @if (workspaceUser.TaskCreationPermission)
             {
-                <button type="button" class="btn btn-primary" style="margin-right:10px" @onclick="ShowAddChatRoomDialogButton">Add new ChatRoom</button>
+                <button type="button" class="btn btn-primary" style="margin-right:10px" 
+                @onclick="ShowAddChatRoomDialogButton">Add new ChatRoom</button>
                 <button type="button" class="btn btn-danger">Delete ChatRoom</button>
             }
         </div>
@@ -76,7 +77,7 @@ else
                         </li>
                         <li class="bg-white mb-3">
                             <div data-mdb-input-init class="form-outline">
-                                <textarea class="form-control bg-body-tertiary" id="textAreaExample2" rows="4"></textarea>
+                                <textarea class="form-control bg-body-tertiary" id="textAreaExample2" rows="4" @bind="message"></textarea>
                                 <label class="form-label" for="textAreaExample2">Message</label>
                             </div>
                         </li>
@@ -97,7 +98,9 @@ else
                                 {
                                     @foreach(var chatRoom in chatRoomList)
                                     {
-                                        <li class="p-2 border-bottom bg-body-tertiary">
+                                        @if (!chatRoom.IsDeleted)
+                                        {
+                                            <li class="p-2 border-bottom bg-body-tertiary">
                                             <div class="d-flex flex-row" style="align-items:center;">
                                                 <div class="pt-1">
                                                     <p class="fw-bold mb-0"><Icon Name="IconName.ChatLeftDots"></Icon> @chatRoom.Name</p>
@@ -108,7 +111,8 @@ else
                                                 <p class="small text-muted mb-1">Just now</p>
                                                 <span class="badge bg-danger float-end">1</span>
                                             </div> *@
-                                        </li>
+                                            </li>
+                                        }
                                     }
                                 }
                             </ul>
@@ -172,19 +176,19 @@ else
 
 
 @code {
+    private HubConnection hubConnection; // SignalR 허브 연결용
+    private List<string> messages = new List<string>();
+    private string userInput;
+
     public bool IsConnected =>
         hubConnection.State == HubConnectionState.Connected;
 
     private WorkspaceUser workspaceUser = null; // 현재 사용자의 워크스페이스 사용자 정보
 
-    private HubConnection hubConnection; // SignalR 허브 연결용
-    private List<string> messages = new List<string>();
-    private string userInput;
-
     private List<WorkspaceUser> workspaceUserList = null;
     private List<WorkspaceUser> selectedWorkspaceUsers = new List<WorkspaceUser>();
     private int selectedWorkspaceId = -1;
-    private ChatRoom selectecChatRoom = null;
+    private ChatRoom selectedChatRoom = null;
 
     private List<ChatRoom> chatRoomList = null;
     private List<Chat> chats = null;
@@ -194,6 +198,10 @@ else
 
     private ChatRoom newChatRoom = new ChatRoom();
 
+    #endregion
+
+    #region 채팅 속성
+    private string message = string.Empty;
     #endregion
 
     AuthenticationState authState;
@@ -222,6 +230,18 @@ else
             var encodedMsg = $"{user}: {message}";
             messages.Add(encodedMsg);
             StateHasChanged();
+
+        });
+
+        hubConnection.On<IEnumerable<dynamic>>("LoadMessage", (loadedMessages) =>
+        {
+            messages.Clear();
+            foreach (var msg in loadedMessages)
+            {
+                messages.Add($"{msg.UserName}: {msg.Message}");
+            }
+            InvokeAsync(StateHasChanged);
+
         });
 
         await hubConnection.StartAsync();
@@ -273,9 +293,7 @@ else
         newChatRoom.WorkspaceId = selectedWorkspaceId;
         newChatRoom.IsDefault = false;
         await ChatRoomRepository.AddChatRoomAsync(newChatRoom);
-        
-        // 왜 안닫히는지 모름
-        // 나중에 확인
+
         newChatRoom = new ChatRoom();
         isShowAddChatRoomDialog = false;
 
@@ -289,14 +307,27 @@ else
     }
     #endregion
 
-    Task SendMessage()
-    {
-        return hubConnection.SendAsync("SendMessage", "User", userInput);
-    }
-    // SendMessage() 대신 아래 함수를 사용!
-    // public async Task SendMessageToUsers(List<string> userIds, string message)
-    // {
-    //     await Clients.Users(userIds).SendAsync("ReceiveMessage", message);
-    // }
 
+
+    #region 채팅 함수
+    // 사용법 공부하면서 사용
+    // SendMessage() 대신 아래 함수를 사용!
+    private async Task JoinRoom()
+    {
+        await hubConnection.SendAsync("JoinRoom", selectedChatRoom);
+    }
+
+    private async Task SendMessage()
+    {
+        await hubConnection.SendAsync("SendMessageToRoom", selectedChatRoom, userInput, message);
+    }
+
+    public void SendMessageButton()
+    {
+        if (!string.IsNullOrEmpty(message))
+        {
+            
+        }
+    }
+    #endregion
 }
