@@ -24,5 +24,7 @@ namespace ProjectAssistant1
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
+
     }
 }

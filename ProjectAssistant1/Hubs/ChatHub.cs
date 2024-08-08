@@ -6,6 +6,7 @@ using ProjectAssistant1.Models.Models.ChatModel;
 using System.Linq;
 using System;
 using ProjectAssistant1.Models.Models.ChatRoomModel;
+using System.Collections.Generic;
 
 namespace ProjectAssistant1.Hubs
 {
@@ -30,7 +31,7 @@ namespace ProjectAssistant1.Hubs
 
         public async Task LoadMessages(string chatRoomName)
         {
-            var messages = _context.Chats
+            List<Chat> messages = _context.Chats
                 .Where(m => m.ChatRoom.Name == chatRoomName)
                 .OrderBy(m => m.Created)
                 .ToList();

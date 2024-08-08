@@ -29,6 +29,7 @@ using ProjectAssistant1.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 using ProjectAssistant1.Models.Models.ChatRoomModel;
 using ProjectAssistant1.Models.Models.ChatModel;
+using System.Text.Json.Serialization;
 
 namespace ProjectAssistant1
 {
@@ -55,6 +56,15 @@ namespace ProjectAssistant1
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
+
+            // 순환 참조 방지
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.WriteIndented = true;
+            });
 
             // Blazor Bootstrap 추가
             services.AddBlazorBootstrap();
@@ -84,6 +94,12 @@ namespace ProjectAssistant1
                     new[] { "application/octet-stream" });
             });
             services.AddSignalR();
+
+            // 순환 참조 방지
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

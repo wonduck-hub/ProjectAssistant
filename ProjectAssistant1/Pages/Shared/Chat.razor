@@ -57,32 +57,44 @@ else
 
                 <!--채팅 리스트-->
                 <div class="col-md-6 col-lg-7 col-xl-8" >
-
-                    <ul class="list-unstyled">
-                        <li class="d-flex justify-content-between mb-4">
-                            <img src="/images/default-user-icon.png" alt="avatar"
-                                 class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="60">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between p-3">
-                                    <p class="fw-bold mb-0">Brad Pitt</p>
-                                    <p class="text-muted small mb-0"><i class="far fa-clock"></i> 12 mins ago</p>
+                    @if (selectedChatRoom != null )
+                    {
+                        <h5 class="font-weight-bold mb-3 text-center text-lg-start">@selectedChatRoom.Name</h5>
+                        <ul class="list-unstyled">
+                            @foreach (var chat in messages)
+                            {
+                                <li class="d-flex justify-content-between mb-4">
+                                    <img src="/images/default-user-icon.png" alt="avatar"
+                                         class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="60">
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between p-3">
+                                            <p class="fw-bold mb-0">Brad Pitt</p>
+                                            <p class="text-muted small mb-0"><i class="far fa-clock"></i> 12 mins ago</p>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="mb-0">
+                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                                                labore et dolore magna aliqua.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                            
+                            <li class="bg-white mb-3">
+                                <div data-mdb-input-init class="form-outline">
+                                    <textarea class="form-control bg-body-tertiary" id="textAreaExample2" rows="4" @bind="message"></textarea>
+                                    <label class="form-label" for="textAreaExample2">Message</label>
                                 </div>
-                                <div class="card-body">
-                                    <p class="mb-0">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                                        labore et dolore magna aliqua.
-                                    </p>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="bg-white mb-3">
-                            <div data-mdb-input-init class="form-outline">
-                                <textarea class="form-control bg-body-tertiary" id="textAreaExample2" rows="4" @bind="message"></textarea>
-                                <label class="form-label" for="textAreaExample2">Message</label>
-                            </div>
-                        </li>
-                        <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-rounded float-end">Send</button>
-                    </ul>
+                            </li>
+                            <button type="button" @onclick="SendMessageButton" data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-rounded float-end">Send</button>
+                        </ul>
+                    }
+                    else 
+                    {
+                        <h5 class="font-weight-bold mb-3 text-center text-lg-start">채팅방을 선택해 주세요</h5>
+                    }
+                    
 
                 </div>
 
@@ -100,9 +112,9 @@ else
                                     {
                                         @if (!chatRoom.IsDeleted)
                                         {
-                                            <li class="p-2 border-bottom bg-body-tertiary">
+                                            <li class="p-2 border-bottom bg-body-tertiary" @onclick="() => ClickChatRoom(chatRoom)">
                                             <div class="d-flex flex-row" style="align-items:center;">
-                                                <div class="pt-1">
+                                                    <div class="pt-1">
                                                     <p class="fw-bold mb-0"><Icon Name="IconName.ChatLeftDots"></Icon> @chatRoom.Name</p>
                                                     @* <p class="small text-muted">Hello, Are you there?</p> *@
                                                 </div>
@@ -177,7 +189,7 @@ else
 
 @code {
     private HubConnection hubConnection; // SignalR 허브 연결용
-    private List<string> messages = new List<string>();
+    private List<Chat> messages = new List<Chat>();
     private string userInput;
 
     public bool IsConnected =>
@@ -225,20 +237,19 @@ else
             .Build();
 
         // 서버로 부터 받은 메시지 핸들러 등록
-        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        hubConnection.On<string, Chat>("ReceiveMessage", (user, message) =>
         {
-            var encodedMsg = $"{user}: {message}";
-            messages.Add(encodedMsg);
+            messages.Add(message);
             StateHasChanged();
 
         });
 
-        hubConnection.On<IEnumerable<dynamic>>("LoadMessage", (loadedMessages) =>
+        hubConnection.On<IEnumerable<Chat>>("LoadMessage", (loadedMessages) =>
         {
             messages.Clear();
             foreach (var msg in loadedMessages)
             {
-                messages.Add($"{msg.UserName}: {msg.Message}");
+                messages.Add(msg);
             }
             InvokeAsync(StateHasChanged);
 
@@ -276,6 +287,7 @@ else
     {
         // 선택된 워크스페이스를 사용하는 코드
         chatRoomList = await ChatRoomRepository.GetChatRoomByWorkspaceId(selectedWorkspaceId);
+        selectedChatRoom = null;
     }
 
     #region 챗룸 추가 삭제 함수
@@ -305,16 +317,22 @@ else
         newChatRoom = new ChatRoom();
         isShowAddChatRoomDialog = false;
     }
+
+    private async Task ClickChatRoom(ChatRoom cr)
+    {
+        selectedChatRoom = cr;
+        await JoinRoom();
+    }
     #endregion
 
 
 
-    #region 채팅 함수
+    #region SignalR 함수
     // 사용법 공부하면서 사용
     // SendMessage() 대신 아래 함수를 사용!
     private async Task JoinRoom()
     {
-        await hubConnection.SendAsync("JoinRoom", selectedChatRoom);
+        await hubConnection.SendAsync("JoinRoom", selectedChatRoom.Name);
     }
 
     private async Task SendMessage()
@@ -322,12 +340,15 @@ else
         await hubConnection.SendAsync("SendMessageToRoom", selectedChatRoom, userInput, message);
     }
 
-    public void SendMessageButton()
+    public async Task SendMessageButton()
     {
         if (!string.IsNullOrEmpty(message))
         {
-            
+            await SendMessage();
+
+            message = string.Empty;
         }
     }
     #endregion
+    
 }
