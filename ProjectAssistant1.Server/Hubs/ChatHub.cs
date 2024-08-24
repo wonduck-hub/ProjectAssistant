@@ -19,19 +19,19 @@ namespace ProjectAssistant1.Hubs
             _context = context;
         }
 
-        public async Task SendMessageToChatRoom(ChatRoom chatRoom, string userName, string message)
+        public async Task SendMessageToChatRoom(ChatRoom selectedChatRoom, string userInput)
         {
-            var chatMessage = new Chat(message, chatRoom);
+            Chat chatMessage = new Chat(userInput, selectedChatRoom);
 
             _context.Chats.Add(chatMessage);
             await _context.SaveChangesAsync();
 
-            await Clients.Group(chatRoom.Name).SendAsync("ReceiveMessage", userName, message);
+            await Clients.Group(selectedChatRoom.Name).SendAsync("ReceiveMessage", chatMessage);
         }
 
         public async Task LoadMessages(string chatRoomName)
         {
-            List<Chat> messages = _context.Chats
+            var messages = _context.Chats
                 .Where(m => m.ChatRoom.Name == chatRoomName)
                 .OrderBy(m => m.Created)
                 .ToList();

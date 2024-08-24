@@ -2,6 +2,7 @@
 using System;
 using ProjectAssistant1.Models.Models.WorkspaceUserModel;
 using ProjectAssistant1.Models.Models.UserWorkModel;
+using ProjectAssistant1.Models.Models.ChatModel;
 
 namespace ProjectAssistant1.Models.UserModel { 
     public class User
@@ -27,5 +28,6 @@ namespace ProjectAssistant1.Models.UserModel {
         // 관계용
         public IEnumerable<WorkspaceUser> WorkspaceUsers { get; set; }
         public IEnumerable<UserWork> UserWorks { get; set; }
+        public IEnumerable<Chat> Chats { get; set; }
     }
 }

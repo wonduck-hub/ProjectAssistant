@@ -1,4 +1,4 @@
-﻿@page "/Chat"
+﻿@page "/ChatPage"
 
 @using Microsoft.AspNetCore.SignalR.Client
 
@@ -61,20 +61,19 @@ else
                     {
                         <h5 class="font-weight-bold mb-3 text-center text-lg-start">@selectedChatRoom.Name</h5>
                         <ul class="list-unstyled">
-                            @foreach (var chat in messages)
+                            @foreach (Chat c in messages)
                             {
                                 <li class="d-flex justify-content-between mb-4">
                                     <img src="/images/default-user-icon.png" alt="avatar"
                                          class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="60">
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between p-3">
-                                            <p class="fw-bold mb-0">Brad Pitt</p>
-                                            <p class="text-muted small mb-0"><i class="far fa-clock"></i> 12 mins ago</p>
+                                            <p class="fw-bold mb-0">@c.User.UserName</p>
+                                            <p class="text-muted small mb-0"><i class="far fa-clock"></i>time</p>
                                         </div>
                                         <div class="card-body">
                                             <p class="mb-0">
-                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                                                labore et dolore magna aliqua.
+                                                @c.Text
                                             </p>
                                         </div>
                                     </div>
@@ -83,11 +82,14 @@ else
                             
                             <li class="bg-white mb-3">
                                 <div data-mdb-input-init class="form-outline">
-                                    <textarea class="form-control bg-body-tertiary" id="textAreaExample2" rows="4" @bind="message"></textarea>
+                                    <textarea class="form-control bg-body-tertiary" id="textAreaExample2" rows="4" @bind="userInput">
+                                    </textarea>
                                     <label class="form-label" for="textAreaExample2">Message</label>
                                 </div>
                             </li>
-                            <button type="button" @onclick="SendMessageButton" data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-rounded float-end">Send</button>
+                            <button type="button" @onclick="SendMessage" 
+                                data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-rounded float-end">
+                                Send</button>
                         </ul>
                     }
                     else 
@@ -168,7 +170,7 @@ else
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Detail</h5>
+                        <h5 class="modal-title">Add ChatRoom</h5>
                     </div>
                     <div class="modal-body">
                         <label>이름:</label>
@@ -205,16 +207,9 @@ else
     private List<ChatRoom> chatRoomList = null;
     private List<Chat> chats = null;
 
-    #region 챗룸 추가 삭제 속성
     private bool isShowAddChatRoomDialog = false;
 
     private ChatRoom newChatRoom = new ChatRoom();
-
-    #endregion
-
-    #region 채팅 속성
-    private string message = string.Empty;
-    #endregion
 
     AuthenticationState authState;
     ClaimsPrincipal user;
@@ -232,14 +227,14 @@ else
             NavigationManager.NavigateTo("Identity/Account/Login");
         }
 
-        hubConnection = new HubConnectionBuilder() // 허브 연결
-            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://localhost:44382/chathub") // 서버 URL에 맞게 수정
             .Build();
 
         // 서버로 부터 받은 메시지 핸들러 등록
-        hubConnection.On<string, Chat>("ReceiveMessage", (user, message) =>
+        hubConnection.On<Chat>("ReceiveMessage", (chatMessage) =>
         {
-            messages.Add(message);
+            messages.Add(chatMessage);
             StateHasChanged();
 
         });
@@ -270,14 +265,17 @@ else
 
     protected async Task LoadWorkspaceUserAsync()
     {
-        workspaceUserList = await WorkspaceUserRepository.GetWorkspaceUserByUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+        workspaceUserList = 
+            await WorkspaceUserRepository.GetWorkspaceUserByUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
         if (workspaceUserList.Count > 0)
         {
             selectedWorkspaceId = workspaceUserList[0].WorkspaceId;
             selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
         }
 
-        workspaceUser = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceIdUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, selectedWorkspaceId);
+        workspaceUser = 
+            await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceIdUserId(
+                user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, selectedWorkspaceId);
 
 
         await LoadChatServiceAsync();
@@ -320,6 +318,8 @@ else
 
     private async Task ClickChatRoom(ChatRoom cr)
     {
+        if (selectedChatRoom != null)
+            await hubConnection.SendAsync("LeaveRoom", selectedChatRoom.Name);
         selectedChatRoom = cr;
         await JoinRoom();
     }
@@ -337,16 +337,11 @@ else
 
     private async Task SendMessage()
     {
-        await hubConnection.SendAsync("SendMessageToRoom", selectedChatRoom, userInput, message);
-    }
-
-    public async Task SendMessageButton()
-    {
-        if (!string.IsNullOrEmpty(message))
+        if (!string.IsNullOrEmpty(userInput))
         {
-            await SendMessage();
+            await hubConnection.SendAsync("SendMessageToChatRoom", selectedChatRoom, userInput);
 
-            message = string.Empty;
+            userInput = string.Empty;
         }
     }
     #endregion

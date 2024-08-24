@@ -28,6 +28,7 @@ namespace ProjectAssistant1.Models.Models.ChatModel
         {
             this.Text = text;
             this.ChatRoom = chatRoom;
+            ChatRoomId = chatRoom.Id;
         }
 
         public Chat(string text)

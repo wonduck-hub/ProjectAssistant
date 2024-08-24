@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using ProjectAssistant1.Hubs;
+//using ProjectAssistant1.Server.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 using ProjectAssistant1.Models.Models.ChatRoomModel;
 using ProjectAssistant1.Models.Models.ChatModel;
@@ -57,15 +57,6 @@ namespace ProjectAssistant1
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
 
-            // 순환 참조 방지
-            services.AddRazorPages();
-            services.AddServerSideBlazor();
-            services.AddControllers().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-                options.JsonSerializerOptions.WriteIndented = true;
-            });
-
             // Blazor Bootstrap 추가
             services.AddBlazorBootstrap();
 
@@ -87,19 +78,7 @@ namespace ProjectAssistant1
             services.AddTransient<IChatRoomRepository, ChatRoomRepository>();
             services.AddTransient<IChatRepository, ChatRepository>();
 
-            // SignalR 
-            services.AddResponseCompression(opts =>
-            {
-                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                    new[] { "application/octet-stream" });
-            });
-            services.AddSignalR();
-
-            // 순환 참조 방지
-            services.AddControllers().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-            });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -132,13 +111,7 @@ namespace ProjectAssistant1
                 endpoints.MapFallbackToPage("/_Host");
             });
 
-            // SignalR
-            app.UseResponseCompression();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapHub<ChatHub>("/chathub");
-            });
+            
         }
     }
 }

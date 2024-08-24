@@ -76,6 +76,18 @@ namespace ProjectAssistant1.Models
                 .HasOne(uw => uw.Workspace)
                 .WithMany(w => w.UserWorks)
                 .HasForeignKey(uw => uw.WorkspaceId);
+
+            // ChatRoom과 Chat의 다대일 관계 설정
+            modelBuilder.Entity<Chat>()
+                .HasOne(c => c.ChatRoom)
+                .WithMany(cr => cr.Chats)
+                .HasForeignKey(c => c.ChatRoomId);
+
+            // User와 Chat의 다대일 관계 설정
+            modelBuilder.Entity<Chat>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Chats)
+                .HasForeignKey(c => c.UserId);
         }
 
 
