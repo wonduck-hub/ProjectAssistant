@@ -333,7 +333,6 @@ else
     {
         await hubConnection.StartAsync(); // 왜인지 모르겠지만 이걸 넣어야 작동됨!!!!!
         await Task.Delay(1000); // 문제 많은 수정!!!!!!!!!!!!!!!!!
-        ㅁㄴㅇㄻㄴㄹ
         await JSRuntime.InvokeVoidAsync("alert", $"{hubConnection.State}"); // Alert
 
         if (hubConnection.State == HubConnectionState.Connected)
