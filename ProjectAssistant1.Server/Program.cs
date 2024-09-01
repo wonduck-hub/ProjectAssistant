@@ -19,7 +19,10 @@ namespace ProjectAssistant1.Server
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                     new[] { "application/octet-stream" });
             });
-            builder.Services.AddSignalR();
+            builder.Services.AddSignalR(o =>
+            {
+                o.EnableDetailedErrors = true;
+            });
 
             var app = builder.Build();
 
@@ -30,8 +33,6 @@ namespace ProjectAssistant1.Server
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -49,7 +50,7 @@ namespace ProjectAssistant1.Server
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
-                endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapHub<ChatHub>("/ChatHub");
             });
 
             app.Run();

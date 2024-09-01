@@ -1905,7 +1905,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjectAssistant1.Models\ProjectAssistant1.Models.csproj" />
-    <ProjectReference Include="..\ProjectAssistant1.Server\ProjectAssistant1.Server.csproj" />
   </ItemGroup>
 
 </Project>
