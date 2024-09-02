@@ -15,11 +15,7 @@
 <hr />
 <br />
 
-@if (workspaceUserList == null)
-{
-    <div>로딩중...</div>
-}
-else if(workspaceUserList.Count == 0)
+@if(workspaceUserList.Count == 0)
 {
     <div>포함되어 있는 워크스페이스가 없습니다.</div>
 }
@@ -331,10 +327,6 @@ else
     // SendMessage() 대신 아래 함수를 사용!
     private async Task JoinRoom()
     {
-        await hubConnection.StartAsync(); // 왜인지 모르겠지만 이걸 넣어야 작동됨!!!!!
-        await Task.Delay(1000); // 문제 많은 수정!!!!!!!!!!!!!!!!!
-        await JSRuntime.InvokeVoidAsync("alert", $"{hubConnection.State}"); // Alert
-
         if (hubConnection.State == HubConnectionState.Connected)
         {
             await hubConnection.SendAsync("JoinRoom", selectedChatRoom.Name);
@@ -349,8 +341,6 @@ else
 
     private async Task SendMessage()
     {
-        await hubConnection.StartAsync(); // 왜인지 모르겠지만 이걸 넣어야 작동됨!!!!!
-
         if (hubConnection.State == HubConnectionState.Connected)
         {
             if (!string.IsNullOrEmpty(userInput))

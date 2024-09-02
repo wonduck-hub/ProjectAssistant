@@ -1,5 +1,8 @@
-using Microsoft.AspNetCore.ResponseCompression;
+﻿using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using ProjectAssistant1.Hubs;
+using ProjectAssistant1.Models;
+using System.Configuration;
 
 namespace ProjectAssistant1.Server
 {
@@ -12,6 +15,8 @@ namespace ProjectAssistant1.Server
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
+            builder.Services.AddEntityFrameworkSqlServer().AddDbContext<ProjectAssistantDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // SignalR and Response Compression
             builder.Services.AddResponseCompression(opts =>
@@ -38,6 +43,8 @@ namespace ProjectAssistant1.Server
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseCors("AllowSpecificOrigin");
 
             app.UseAuthorization();
 
