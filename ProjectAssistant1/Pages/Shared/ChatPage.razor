@@ -222,7 +222,7 @@ else
         }
 
         hubConnection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:44382/chathub")
+            .WithUrl("https://localhost:44307/chathub")
             .WithAutomaticReconnect()
             .Build();
 
@@ -231,25 +231,33 @@ else
         // 서버로 부터 받은 메시지 핸들러 등록
         hubConnection.On<Chat>("ReceiveMessage", (chatMessage) =>
         {
+            Debug.WriteLine("Receive Message");
             messages.Add(chatMessage);
-            StateHasChanged();
+            InvokeAsync(StateHasChanged);
 
         });
 
-        hubConnection.On<IEnumerable<Chat>>("LoadMessage", (loadedMessages) =>
+        hubConnection.On<IEnumerable<Chat>>("LoadMessages", async (loadedMessages) =>
         {
-            messages.Clear();
+            Debug.WriteLine("Loaded Messages");
+            
             foreach (var msg in loadedMessages)
             {
+                Debug.WriteLine(msg.Text);
                 messages.Add(msg);
             }
-            InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
 
         });
 
         await hubConnection.StartAsync();
 
         await LoadWorkspaceUserAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
     }
 
     protected async Task OnWorkspaceChanged(ChangeEventArgs e)
@@ -315,6 +323,10 @@ else
 
     private async Task ClickChatRoom(ChatRoom cr)
     {
+        if (selectedChatRoom != null)
+        {
+            await hubConnection.SendAsync("LeaveRoom", selectedChatRoom);
+        }
         selectedChatRoom = cr;
         await JoinRoom();
     }
@@ -329,13 +341,14 @@ else
     {
         if (hubConnection.State == HubConnectionState.Connected)
         {
-            await hubConnection.SendAsync("JoinRoom", selectedChatRoom.Name);
+            Debug.WriteLine(selectedChatRoom.Name);
+            await hubConnection.SendAsync("JoinRoom", selectedChatRoom);
         }
         else
         {
             // 연결이 활성 상태가 아닐 때의 처리
             // 예를 들어, 연결을 재시도하거나 사용자에게 알림을 표시할 수 있습니다.
-            await JSRuntime.InvokeVoidAsync("alert", "connection error!"); // Alert
+            Debug.WriteLine("connection error"); // Alert
         }
     }
 
@@ -345,8 +358,9 @@ else
         {
             if (!string.IsNullOrEmpty(userInput))
             {
-                await hubConnection.SendAsync("SendMessageToChatRoom", selectedChatRoom, userInput);
-
+                await hubConnection.SendAsync("SendMessageToChatRoom", 
+                    selectedChatRoom, user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value,  userInput);
+                Debug.WriteLine(messages.Count);
                 userInput = string.Empty;
             }
         

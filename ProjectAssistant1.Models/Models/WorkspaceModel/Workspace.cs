@@ -3,6 +3,7 @@ using ProjectAssistant1.Models.Models.UserWorkModel;
 using ProjectAssistant1.Models.Models.WorkspaceUserModel;
 using ProjectAssistant1.Models.Models.WorkspaceWorkModel;
 using System;
+using System.Text.Json.Serialization;
 
 namespace ProjectAssistant1.Models.WorkspaceModel
 {
@@ -20,9 +21,13 @@ namespace ProjectAssistant1.Models.WorkspaceModel
         public bool IsDeleted { get; set; } = false;
 
         // 관계용
-        public IEnumerable<WorkspaceUser> WorkspaceUsers { get; set; }
-        public IEnumerable<WorkspaceWork> WorkspaceWorks { get; set; }
-        public IEnumerable<UserWork> UserWorks { get; set; }
+        [JsonIgnore]
+        public virtual IEnumerable<WorkspaceUser> WorkspaceUsers { get; set; }
+        [JsonIgnore]
+        public virtual IEnumerable<WorkspaceWork> WorkspaceWorks { get; set; }
+        [JsonIgnore]
+        public virtual IEnumerable<UserWork> UserWorks { get; set; }
+        [JsonIgnore]
         public virtual ICollection<ChatRoom> ChatRooms { get; set; }
     }
 }

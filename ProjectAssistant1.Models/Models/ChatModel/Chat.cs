@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 using ProjectAssistant1.Models.Models.ChatRoomModel;
@@ -21,14 +22,16 @@ namespace ProjectAssistant1.Models.Models.ChatModel
         public string UserId { get; set; }
 
         // Navigation property for the ChatRoom foreign key
-        public ChatRoom ChatRoom { get; set; }
-        public User User { get; set; }
+        [JsonIgnore]
+        virtual public ChatRoom ChatRoom { get; set; }
+        [JsonIgnore]
+        virtual public User User { get; set; }
 
-        public Chat(string text, ChatRoom chatRoom)
+        public Chat(string text, int chatRoomId, string userId)
         {
             this.Text = text;
-            this.ChatRoom = chatRoom;
-            ChatRoomId = chatRoom.Id;
+            ChatRoomId = chatRoomId;
+            this.UserId = userId;
         }
 
         public Chat(string text)

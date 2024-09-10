@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ProjectAssistant1.Models.WorkspaceModel;
 using ProjectAssistant1.Models.Models.ChatModel;
+using System.Text.Json.Serialization;
 
 namespace ProjectAssistant1.Models.Models.ChatRoomModel
 {
@@ -23,6 +24,7 @@ namespace ProjectAssistant1.Models.Models.ChatRoomModel
 
         // Navigation property for the Workspace foreign key
         public virtual Workspace Workspace { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Chat> Chats { get; set; }
 
 

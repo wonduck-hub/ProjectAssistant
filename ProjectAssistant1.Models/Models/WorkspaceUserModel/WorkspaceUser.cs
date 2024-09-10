@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
@@ -37,7 +38,9 @@ namespace ProjectAssistant1.Models.Models.WorkspaceUserModel
         public bool TaskCreationPermission { get; set; }
 
         // Navigation properties
-        public User User { get; set; }
-        public Workspace Workspace { get; set; }
+        [JsonIgnore]
+        virtual public User User { get; set; }
+        [JsonIgnore]
+        virtual public Workspace Workspace { get; set; }
     }
 }

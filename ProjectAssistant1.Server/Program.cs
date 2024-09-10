@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectAssistant1.Hubs;
 using ProjectAssistant1.Models;
 using System.Configuration;
+using System.Text.Json.Serialization;
 
 namespace ProjectAssistant1.Server
 {
@@ -15,8 +16,15 @@ namespace ProjectAssistant1.Server
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
-            builder.Services.AddEntityFrameworkSqlServer().AddDbContext<ProjectAssistantDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddEntityFrameworkSqlServer()
+            .AddDbContext<ProjectAssistantDbContext>(options =>
+                options.UseLazyLoadingProxies() // Lazy Loading Proxies 활성화
+                       .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddControllersWithViews().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            });
 
             // SignalR and Response Compression
             builder.Services.AddResponseCompression(opts =>
@@ -51,6 +59,8 @@ namespace ProjectAssistant1.Server
             app.MapRazorPages();
 
             // SignalR
+            app.UseResponseCompression();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

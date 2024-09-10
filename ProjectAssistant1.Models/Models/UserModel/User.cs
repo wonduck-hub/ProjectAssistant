@@ -3,6 +3,7 @@ using System;
 using ProjectAssistant1.Models.Models.WorkspaceUserModel;
 using ProjectAssistant1.Models.Models.UserWorkModel;
 using ProjectAssistant1.Models.Models.ChatModel;
+using System.Text.Json.Serialization;
 
 namespace ProjectAssistant1.Models.UserModel { 
     public class User
@@ -26,8 +27,11 @@ namespace ProjectAssistant1.Models.UserModel {
         public int? AccessFailedCount { get; set; }
 
         // 관계용
-        public IEnumerable<WorkspaceUser> WorkspaceUsers { get; set; }
-        public IEnumerable<UserWork> UserWorks { get; set; }
-        public IEnumerable<Chat> Chats { get; set; }
+        [JsonIgnore]
+        virtual public IEnumerable<WorkspaceUser> WorkspaceUsers { get; set; }
+        [JsonIgnore]
+        virtual public IEnumerable<UserWork> UserWorks { get; set; }
+        [JsonIgnore]
+        virtual public IEnumerable<Chat> Chats { get; set; }
     }
 }

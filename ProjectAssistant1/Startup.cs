@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-//using ProjectAssistant1.Server.Hubs;
+using ProjectAssistant1.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 using ProjectAssistant1.Models.Models.ChatRoomModel;
 using ProjectAssistant1.Models.Models.ChatModel;
@@ -57,13 +57,19 @@ namespace ProjectAssistant1
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
 
+            services.AddControllersWithViews().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            });
+
             // Blazor Bootstrap 추가
             services.AddBlazorBootstrap();
 
             // new DbContext
-            services.AddEntityFrameworkSqlServer().AddDbContext<ProjectAssistantDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+            services.AddEntityFrameworkSqlServer()
+            .AddDbContext<ProjectAssistantDbContext>(options =>
+                options.UseLazyLoadingProxies() // Lazy Loading Proxies 활성화
+                       .UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             // DI Container
             services.AddTransient<IWorkspaceRepositoryAsync, WorkspaceRepository>();
@@ -78,7 +84,16 @@ namespace ProjectAssistant1
             services.AddTransient<IChatRoomRepository, ChatRoomRepository>();
             services.AddTransient<IChatRepository, ChatRepository>();
 
-            
+            // SignalR and Response Compression
+            services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
+            services.AddSignalR(o =>
+            {
+                o.EnableDetailedErrors = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -111,7 +126,19 @@ namespace ProjectAssistant1
                 endpoints.MapFallbackToPage("/_Host");
             });
 
-            
+            // SignalR
+            app.UseResponseCompression();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
+                endpoints.MapHub<ChatHub>("/ChatHub");
+            });
+
+
         }
     }
 }

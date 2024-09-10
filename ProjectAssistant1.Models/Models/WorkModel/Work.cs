@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace ProjectAssistant1.Models.Models
@@ -25,7 +26,9 @@ namespace ProjectAssistant1.Models.Models
         public int ListId { get; set; }
 
         // 관계용
-        public IEnumerable<UserWork> UserWorks { get; set; }
-        public IEnumerable<WorkspaceWork> WorkspaceWorks { get; set; }
+        [JsonIgnore]
+        virtual public IEnumerable<UserWork> UserWorks { get; set; }
+        [JsonIgnore]
+        virtual public IEnumerable<WorkspaceWork> WorkspaceWorks { get; set; }
     }
 }
