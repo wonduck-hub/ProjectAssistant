@@ -66,7 +66,10 @@ else
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between p-3">
                                             <p class="fw-bold mb-0">@c.User.UserName</p>
-                                            <p class="text-muted small mb-0"><i class="far fa-clock"></i>time</p>
+                                            <p class="text-muted small mb-0">
+                                                <i class="far fa-clock">
+                                                </i>@c.Created.ToString()
+                                            </p>
                                         </div>
                                         <div class="card-body">
                                             <p class="mb-0">
@@ -226,18 +229,19 @@ else
             .Build();
 
         // 서버로 부터 받은 메시지 핸들러 등록
-        hubConnection.On<Chat>("ReceiveMessage", (chatMessage) =>
+        hubConnection.On<Chat>("ReceiveMessage", async (chatMessage) =>
         {
             Debug.WriteLine("Receive Message");
             messages.Add(chatMessage);
-            InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged);
 
         });
 
         hubConnection.On<List<Chat>>("LoadMessages", async (loadedMessages) =>
         {
             Debug.WriteLine("Loaded Messages");
-            
+
+            messages.Clear();
             foreach (var msg in loadedMessages)
             {
                 Debug.WriteLine(msg.Text);

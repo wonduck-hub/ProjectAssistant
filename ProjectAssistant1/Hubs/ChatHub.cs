@@ -8,6 +8,7 @@ using System;
 using ProjectAssistant1.Models.Models.ChatRoomModel;
 using System.Collections.Generic;
 using System.Diagnostics;
+using ProjectAssistant1.Models.UserModel;
 
 namespace ProjectAssistant1.Hubs
 {
@@ -26,11 +27,10 @@ namespace ProjectAssistant1.Hubs
             Debug.WriteLine(selectedChatRoom.Id.ToString());
             Chat chatMessage = new Chat(userInput, selectedChatRoom.Id, userId);
 
-            _context.Chats.Add(chatMessage);
-            await _context.SaveChangesAsync();
+            ChatRepository cr = new ChatRepository(_context);
+            await cr.AddChatAsync(chatMessage, userId, selectedChatRoom);
 
-            // await Clients.Group(selectedChatRoom.Id.ToString()).SendAsync("ReceiveMessage", chatMessage);
-            await Clients.All.SendAsync("ReceiveMessage", chatMessage);
+            await Clients.Group(selectedChatRoom.Id.ToString()).SendAsync("ReceiveMessage", chatMessage);
         }
 
         public async Task JoinRoom(ChatRoom chatRoom)
@@ -43,8 +43,7 @@ namespace ProjectAssistant1.Hubs
                 .Where(m => m.ChatRoom.Id == chatRoom.Id)
                 .OrderBy(m => m.Created)
                 .ToList();
-            //await Clients.Caller.SendAsync("LoadMessages", messages);
-            await Clients.All.SendAsync("LoadMessages", messages);
+            await Clients.Caller.SendAsync("LoadMessages", messages);
         }
 
         public async Task LeaveRoom(ChatRoom room)

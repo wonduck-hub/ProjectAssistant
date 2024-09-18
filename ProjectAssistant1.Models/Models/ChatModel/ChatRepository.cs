@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ProjectAssistant1.Models.Models.ChatRoomModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,10 +18,12 @@ namespace ProjectAssistant1.Models.Models.ChatModel
             this._context = context;
         }
 
-        public async Task<Chat> AddChatAsync(Chat c)
+        public async Task<Chat> AddChatAsync(Chat c, string userId, ChatRoom chatRoom)
         {
             Debug.Assert(c != null, "Chat is null");
             this._context.Chats.Add(c);
+            c.ChatRoom = chatRoom;
+            c.User = await _context.AspNetUsers.FirstOrDefaultAsync(u => u.Id == userId);
             await _context.SaveChangesAsync();
 
             return c;

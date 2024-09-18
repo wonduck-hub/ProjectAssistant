@@ -23,6 +23,7 @@ namespace ProjectAssistant1.Models.Models.ChatRoomModel
         public int WorkspaceId { get; set; }
 
         // Navigation property for the Workspace foreign key
+        [JsonIgnore]
         public virtual Workspace Workspace { get; set; }
         [JsonIgnore]
         public virtual ICollection<Chat> Chats { get; set; }

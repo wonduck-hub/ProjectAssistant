@@ -22,16 +22,19 @@ namespace ProjectAssistant1.Models.Models.ChatModel
         public string UserId { get; set; }
 
         // Navigation property for the ChatRoom foreign key
-        [JsonIgnore]
         virtual public ChatRoom ChatRoom { get; set; }
-        [JsonIgnore]
         virtual public User User { get; set; }
+
+        public Chat()
+        {
+        }
 
         public Chat(string text, int chatRoomId, string userId)
         {
             this.Text = text;
-            ChatRoomId = chatRoomId;
+            this.ChatRoomId = chatRoomId;
             this.UserId = userId;
+            this.Created = DateTimeOffset.Now;
         }
 
         public Chat(string text)
