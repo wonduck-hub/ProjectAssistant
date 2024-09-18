@@ -85,20 +85,19 @@ namespace ProjectAssistant1
             services.AddTransient<IChatRepository, ChatRepository>();
 
             // SignalR and Response Compression
+            services.AddSignalR();
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                     new[] { "application/octet-stream" });
-            });
-            services.AddSignalR(o =>
-            {
-                o.EnableDetailedErrors = true;
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -131,10 +130,6 @@ namespace ProjectAssistant1
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapRazorPages();
                 endpoints.MapHub<ChatHub>("/ChatHub");
             });
 

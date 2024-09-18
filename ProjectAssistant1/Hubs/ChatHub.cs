@@ -22,16 +22,20 @@ namespace ProjectAssistant1.Hubs
 
         public async Task SendMessageToChatRoom(ChatRoom selectedChatRoom, string userId, string userInput)
         {
+            Debug.WriteLine("SendMessage");
+            Debug.WriteLine(selectedChatRoom.Id.ToString());
             Chat chatMessage = new Chat(userInput, selectedChatRoom.Id, userId);
 
             _context.Chats.Add(chatMessage);
             await _context.SaveChangesAsync();
 
-            await Clients.Group(selectedChatRoom.Id.ToString()).SendAsync("ReceiveMessage", chatMessage);
+            // await Clients.Group(selectedChatRoom.Id.ToString()).SendAsync("ReceiveMessage", chatMessage);
+            await Clients.All.SendAsync("ReceiveMessage", chatMessage);
         }
 
         public async Task JoinRoom(ChatRoom chatRoom)
         {
+            Debug.WriteLine(chatRoom.Id.ToString());
             Debug.WriteLine("Join the chatroom - server");
             await Groups.AddToGroupAsync(Context.ConnectionId, chatRoom.Id.ToString());
 
@@ -39,11 +43,8 @@ namespace ProjectAssistant1.Hubs
                 .Where(m => m.ChatRoom.Id == chatRoom.Id)
                 .OrderBy(m => m.Created)
                 .ToList();
-            foreach (var message in messages)
-            {
-                Debug.WriteLine(message.Text);
-            }
-            await Clients.Caller.SendAsync("LoadMessages", messages);
+            //await Clients.Caller.SendAsync("LoadMessages", messages);
+            await Clients.All.SendAsync("LoadMessages", messages);
         }
 
         public async Task LeaveRoom(ChatRoom room)

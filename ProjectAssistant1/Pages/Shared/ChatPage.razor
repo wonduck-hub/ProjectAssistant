@@ -222,11 +222,8 @@ else
         }
 
         hubConnection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:44307/chathub")
-            .WithAutomaticReconnect()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
             .Build();
-
-        hubConnection.HandshakeTimeout = TimeSpan.FromSeconds(30);
 
         // 서버로 부터 받은 메시지 핸들러 등록
         hubConnection.On<Chat>("ReceiveMessage", (chatMessage) =>
@@ -237,7 +234,7 @@ else
 
         });
 
-        hubConnection.On<IEnumerable<Chat>>("LoadMessages", async (loadedMessages) =>
+        hubConnection.On<List<Chat>>("LoadMessages", async (loadedMessages) =>
         {
             Debug.WriteLine("Loaded Messages");
             
@@ -257,7 +254,10 @@ else
 
     public async ValueTask DisposeAsync()
     {
-        await hubConnection.DisposeAsync();
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
     }
 
     protected async Task OnWorkspaceChanged(ChangeEventArgs e)
@@ -343,12 +343,13 @@ else
         {
             Debug.WriteLine(selectedChatRoom.Name);
             await hubConnection.SendAsync("JoinRoom", selectedChatRoom);
+            Debug.WriteLine("joined room");
         }
         else
         {
             // 연결이 활성 상태가 아닐 때의 처리
             // 예를 들어, 연결을 재시도하거나 사용자에게 알림을 표시할 수 있습니다.
-            Debug.WriteLine("connection error"); // Alert
+            Debug.WriteLine("connection error");
         }
     }
 
