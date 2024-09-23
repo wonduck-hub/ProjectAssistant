@@ -33,6 +33,19 @@ namespace ProjectAssistant1.Hubs
             await Clients.Group(selectedChatRoom.Id.ToString()).SendAsync("ReceiveMessage", chatMessage);
         }
 
+        public async Task SendImageToChatRoom(ChatRoom selectedChatRoom, string userId, string Url)
+        {
+            Debug.WriteLine("SendImage");
+            Debug.WriteLine(selectedChatRoom.Id.ToString());
+            Chat chatMessage = new Chat(Url, selectedChatRoom.Id, userId);
+            chatMessage.IsImage = true;
+
+            ChatRepository cr = new ChatRepository(_context);
+            await cr.AddChatAsync(chatMessage, userId, selectedChatRoom);
+
+            await Clients.Group(selectedChatRoom.Id.ToString()).SendAsync("ReceiveImage", chatMessage);
+        }
+
         public async Task JoinRoom(ChatRoom chatRoom)
         {
             Debug.WriteLine(chatRoom.Id.ToString());

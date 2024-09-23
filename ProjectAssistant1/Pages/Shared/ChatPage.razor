@@ -2,6 +2,7 @@
 
 @using Microsoft.AspNetCore.SignalR.Client
 @using System.Diagnostics
+@using System.IO
 
 @inject IJSRuntime JSRuntime
 
@@ -53,44 +54,58 @@ else
             <div class="row">
 
                 <!--채팅 리스트-->
-                <div class="col-md-6 col-lg-7 col-xl-8" >
+                <div class="col-md-6 col-lg-7 col-xl-8" id="chat-container">
                     @if (selectedChatRoom != null )
                     {
                         <h5 class="font-weight-bold mb-3 text-center text-lg-start">@selectedChatRoom.Name</h5>
-                        <ul class="list-unstyled">
+                        <ul class="list-unstyled" 
+                        style="max-height: 50vh; overflow-y:auto; display:flex; flex-direction: column-reverse;">
                             @foreach (Chat c in messages)
                             {
-                                <li class="d-flex justify-content-between mb-4">
+                                <li class="d-flex justify-content-start mb-4">
                                     <img src="/images/default-user-icon.png" alt="avatar"
-                                         class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="60">
+                                         class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="30">
                                     <div class="card">
-                                        <div class="card-header d-flex justify-content-between p-3">
+                                        <div class="card-header d-flex justify-content-between p-3" 
+                                            style="min-width:200px; width:auto; padding:0.5rem !important;">
                                             <p class="fw-bold mb-0">@c.User.UserName</p>
-                                            <p class="text-muted small mb-0">
+                                            <p class="text-muted small mb-0" style="text-align: left; font-size: 12px; align-items: flex-end;">
                                                 <i class="far fa-clock">
-                                                </i>@c.Created.ToString()
+                                                </i>@c.Created.Value.ToString("yyyy/MM/dd")
                                             </p>
                                         </div>
-                                        <div class="card-body">
-                                            <p class="mb-0">
-                                                @c.Text
-                                            </p>
-                                        </div>
+                                        @if (c.IsImage)
+                                        {
+                                            <div class="card-body">
+                                                <p class="mb-0">
+                                                    <img src="@c.Text" alt="@c.Text" width="200" height="200"/>
+                                                </p>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="card-body">
+                                                <p class="mb-0">
+                                                    @c.Text
+                                                </p>
+                                            </div>
+                                        }
                                     </div>
                                 </li>
                             }
-                            
-                            <li class="bg-white mb-3">
-                                <div data-mdb-input-init class="form-outline">
-                                    <textarea class="form-control bg-body-tertiary" id="textAreaExample2" rows="4" @bind="userInput">
-                                    </textarea>
-                                    <label class="form-label" for="textAreaExample2">Message</label>
-                                </div>
-                            </li>
-                            <button type="button" @onclick="SendMessage" 
-                                data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-rounded float-end">
-                                Send</button>
                         </ul>
+                        <div data-mdb-input-init class="form-outline d-flex align-items-center">
+                            <button type="button" @onclick="ShowUploadImageDialog"
+                                    data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-rounded float-end">
+                                +
+                            </button>
+                            <textarea class="form-control bg-body-tertiary" id="textAreaExample2" rows="1" @bind="userInput">
+                            </textarea>
+                            <button type="button" @onclick="SendMessage"
+                                    data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-rounded float-end">
+                                Send
+                            </button>
+                        </div>
                     }
                     else 
                     {
@@ -185,6 +200,27 @@ else
         </div>
         <div class="modal-backdrop show"></div>
     }
+
+    @if (isShowUploadImageDialog)
+    {
+        <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Select Image</h5>
+                    </div>
+                    <div class="modal-body">
+                        <label>file:</label><br />
+                        <InputFile OnChange="SelectedImageFile"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseUploadImageDialog">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop show"></div>
+    }
 }
 
 
@@ -205,6 +241,7 @@ else
     private List<Chat> chats = null;
 
     private bool isShowAddChatRoomDialog = false;
+    private bool isShowUploadImageDialog = false;
 
     private ChatRoom newChatRoom = new ChatRoom();
 
@@ -233,8 +270,16 @@ else
         {
             Debug.WriteLine("Receive Message");
             messages.Add(chatMessage);
+            messages = (from m in messages orderby m.Created descending select m).ToList<Chat>();
             await InvokeAsync(StateHasChanged);
+        });
 
+        hubConnection.On<Chat>("ReceiveImage", async (chatMessage) =>
+        {
+            Debug.WriteLine("Receive Image");
+            messages.Add(chatMessage);
+            messages = (from m in messages orderby m.Created descending select m).ToList<Chat>();
+            await InvokeAsync(StateHasChanged);
         });
 
         hubConnection.On<List<Chat>>("LoadMessages", async (loadedMessages) =>
@@ -247,8 +292,8 @@ else
                 Debug.WriteLine(msg.Text);
                 messages.Add(msg);
             }
+            messages = (from m in messages orderby m.Created descending select m).ToList<Chat>();
             await InvokeAsync(StateHasChanged);
-
         });
 
         await hubConnection.StartAsync();
@@ -368,9 +413,66 @@ else
                 Debug.WriteLine(messages.Count);
                 userInput = string.Empty;
             }
-        
+
         }
     }
     #endregion
-    
+
+    #region 이미지 업로드 관련 함수
+
+    private void ShowUploadImageDialog(MouseEventArgs e)
+    {
+        isShowUploadImageDialog = true;
+    }
+
+    private void CloseUploadImageDialog(MouseEventArgs e)
+    {
+        isShowUploadImageDialog = false;
+    }
+
+    private async Task SelectedImageFile(InputFileChangeEventArgs e)
+    {
+        var file = e.GetMultipleFiles().FirstOrDefault();
+
+        if (file == null)
+        {
+            Debug.WriteLine("null");
+            return;
+        }
+        
+        if (file.ContentType.StartsWith("image/"))
+        {
+            Debug.WriteLine(file.Name);
+            isShowUploadImageDialog = false;
+
+            // 이미지 파일을 서버에 저장
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.Name;
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.OpenReadStream().CopyToAsync(fileStream);
+            }
+
+            // 이미지 파일의 URL 생성
+            var imageUrl = $"/images/{uniqueFileName}";
+
+            // 이미지 파일의 URL을 데이터베이스에 저장
+            await hubConnection.SendAsync("SendImageToChatRoom",
+                    selectedChatRoom, user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, imageUrl);
+        }
+        else
+        {
+            Debug.WriteLine("not image file");
+            await JSRuntime.InvokeVoidAsync("alert", "이미지 파일이 아닙니다.");
+        }
+    }
+
+    #endregion
 }

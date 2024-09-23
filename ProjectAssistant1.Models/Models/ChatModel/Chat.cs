@@ -14,6 +14,7 @@ namespace ProjectAssistant1.Models.Models.ChatModel
     {
         public int Id { get; set; }
         public string Text { get; set; }
+        public bool IsImage { get; set; }
         public DateTimeOffset? Created { get; set; }
         public DateTimeOffset? Modified { get; set; }
         public bool IsDeleted { get; set; }
