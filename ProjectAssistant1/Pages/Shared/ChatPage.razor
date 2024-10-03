@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @using System.Diagnostics
 @using System.IO
+@using OpenCvSharp
 
 @inject IJSRuntime JSRuntime
 
@@ -41,7 +42,8 @@ else
             {
                 <button type="button" class="btn btn-primary" style="margin-right:10px" 
                 @onclick="ShowAddChatRoomDialogButton">Add new ChatRoom</button>
-                <button type="button" class="btn btn-danger">Delete ChatRoom</button>
+                <button type="button" class="btn btn-danger"
+                @onclick="ShowDeleteChatRoomDialog">Delete ChatRoom</button>
             }
         </div>
     }
@@ -63,34 +65,72 @@ else
                             @foreach (Chat c in messages)
                             {
                                 <li class="d-flex justify-content-start mb-4">
-                                    <img src="/images/default-user-icon.png" alt="avatar"
-                                         class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="30">
-                                    <div class="card">
-                                        <div class="card-header d-flex justify-content-between p-3" 
-                                            style="min-width:200px; width:auto; padding:0.5rem !important;">
-                                            <p class="fw-bold mb-0">@c.User.UserName</p>
-                                            <p class="text-muted small mb-0" style="text-align: left; font-size: 12px; align-items: flex-end;">
-                                                <i class="far fa-clock">
-                                                </i>@c.Created.Value.ToString("yyyy/MM/dd")
-                                            </p>
+                                    @if (!c.IsNotification) 
+                                    {
+                                        <img src="/images/default-user-icon.png" alt="avatar"
+                                             class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="30">
+                                    }   
+                                     
+                                    @if (c.IsNotification)
+                                    {
+                                        <div class="card" style="width:100%;">
+                                            <div class="card-header d-flex justify-content-center p-3"
+                                                    style="min-width:200px; width:auto; padding:0.5rem !important;">
+                                                <p class="fw-bold mb-0">공지</p>
+                                                <p class="text-muted small mb-0" style="text-align: left; font-size: 12px; align-items: flex-end;">
+                                                
+                                                </p>
+                                            </div>
+                                            @if (c.IsImage)
+                                            {
+                                                <div class="card-body">
+                                                    <p class="mb-0">
+                                                        <img src="@c.Text" alt="@c.Text" width="200" height="200"
+                                                                @onclick="@(() => ShowImageDetailDialog(c.Text))" />
+                                                    </p>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="card-body" style="text-align:center;">
+                                                    <p class="mb-0">
+                                                        @c.Text
+                                                    </p>
+                                                </div>
+                                            }
                                         </div>
-                                        @if (c.IsImage)
-                                        {
-                                            <div class="card-body">
-                                                <p class="mb-0">
-                                                    <img src="@c.Text" alt="@c.Text" width="200" height="200"/>
+                                    }
+                                    else
+                                    {
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between p-3" 
+                                                style="min-width:200px; width:auto; padding:0.5rem !important;">
+                                                <p class="fw-bold mb-0">@c.User.UserName</p>
+                                                <p class="text-muted small mb-0" style="text-align: left; font-size: 12px; align-items: flex-end;">
+                                                    <i class="far fa-clock">
+                                                    </i>@c.Created.Value.ToString("yyyy/MM/dd")
                                                 </p>
                                             </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="card-body">
-                                                <p class="mb-0">
-                                                    @c.Text
-                                                </p>
-                                            </div>
-                                        }
-                                    </div>
+                                            @if (c.IsImage)
+                                            {
+                                                <div class="card-body">
+                                                    <p class="mb-0">
+                                                        <img src="@c.Text" alt="@c.Text" width="200" height="200"
+                                                            @onclick="@(() => ShowImageDetailDialog(c.Text))"/>
+                                                    </p>
+                                                </div>
+                                            }
+                                            else 
+                                            {
+                                                <div class="card-body">
+                                                    <p class="mb-0">
+                                                        @c.Text
+                                                    </p>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    
                                 </li>
                             }
                         </ul>
@@ -193,7 +233,45 @@ else
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" @onclick="AddChatRoomDialogButton">Save</button>
-                        <button type="button" class="btn btn-secondary" @onclick="CloseWorkDetailDialogButton">Close</button>
+                        <button type="button" class="btn btn-secondary" @onclick="CloseAddChatRoomDialog">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop show"></div>
+    }
+
+    @if (isShowDeleteChatRoomDialog)
+    {
+        <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add ChatRoom</h5>
+                    </div>
+                    <div class="modal-body">
+                        <label>이름:</label>
+                        <ul class="list-unstyled mb-0">
+                            @if (chatRoomList != null)
+                            {
+                                @foreach (var chatRoom in chatRoomList)
+                                {
+                                    @if (!chatRoom.IsDeleted)
+                                    {
+                                        <li class="p-2 border-bottom bg-body-tertiary" @onclick="() => DeleteChatRoom(chatRoom)">
+                                            <div class="d-flex flex-row" style="align-items:center;">
+                                                <div class="pt-1">
+                                                    <p class="fw-bold mb-0"><Icon Name="IconName.ChatLeftDots"></Icon> @chatRoom.Name</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                            }
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseDeleteChatRoomDialog">Close</button>
                     </div>
                 </div>
             </div>
@@ -221,6 +299,30 @@ else
         </div>
         <div class="modal-backdrop show"></div>
     }
+
+    @if (isShowImageDetailDialog)
+    {
+        <div class="modal fade show" tabindex="-1" role="dialog" style="display:block; ">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between p-3"
+                     style="min-width:200px; width:auto; padding:0.5rem !important;">
+                    <p class="fw-bold mb-0">Image</p>
+                    <p class="text-muted small mb-0" style="text-align: left; font-size: 12px; align-items: flex-end;">
+                        <i class="far fa-clock">
+                        </i>
+                    </p>
+                </div>
+                <div class="card-body" style=" overflow:auto;">
+                    <p class="mb-0">
+                        <img src="@selectedImageURL" alt="@selectedImageURL" style="max-width:100%; max-height:100%; width:auto; height:auto;"/>
+                    </p>
+                </div>
+                <br />
+                <button type="button" class="btn btn-secondary" @onclick="CloseImageDetailDialog">Close</button>
+            </div>
+        </div>
+        <div class="modal-backdrop show"></div>
+    }
 }
 
 
@@ -241,7 +343,11 @@ else
     private List<Chat> chats = null;
 
     private bool isShowAddChatRoomDialog = false;
+    private bool isShowDeleteChatRoomDialog = false;
     private bool isShowUploadImageDialog = false;
+    private bool isShowImageDetailDialog = false;
+
+    private string selectedImageURL = string.Empty;
 
     private ChatRoom newChatRoom = new ChatRoom();
 
@@ -355,7 +461,7 @@ else
             newChatRoom.Name = "미정";
         }
         newChatRoom.WorkspaceId = selectedWorkspaceId;
-        newChatRoom.IsDefault = false;
+        newChatRoom.IsNotification = false;
         await ChatRoomRepository.AddChatRoomAsync(newChatRoom);
 
         newChatRoom = new ChatRoom();
@@ -364,7 +470,7 @@ else
         await LoadChatServiceAsync();
     }
 
-    protected void CloseWorkDetailDialogButton()
+    protected void CloseAddChatRoomDialog()
     {
         newChatRoom = new ChatRoom();
         isShowAddChatRoomDialog = false;
@@ -378,6 +484,24 @@ else
         }
         selectedChatRoom = cr;
         await JoinRoom();
+    }
+
+    private void ShowDeleteChatRoomDialog(MouseEventArgs e)
+    {
+        isShowDeleteChatRoomDialog = true;
+    }
+
+    private void CloseDeleteChatRoomDialog(MouseEventArgs e)
+    {
+        isShowDeleteChatRoomDialog = false;
+    }
+
+    private async Task DeleteChatRoom(ChatRoom cr)
+    {
+        await ChatRoomRepository.DeleteChatRoomById(cr.Id);
+        isShowDeleteChatRoomDialog = false;
+
+        await LoadChatServiceAsync();
     }
     #endregion
 
@@ -409,7 +533,7 @@ else
             if (!string.IsNullOrEmpty(userInput))
             {
                 await hubConnection.SendAsync("SendMessageToChatRoom", 
-                    selectedChatRoom, user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value,  userInput);
+                    selectedChatRoom, user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value,  userInput, false);
                 Debug.WriteLine(messages.Count);
                 userInput = string.Empty;
             }
@@ -439,7 +563,7 @@ else
             Debug.WriteLine("null");
             return;
         }
-        
+
         if (file.ContentType.StartsWith("image/"))
         {
             Debug.WriteLine(file.Name);
@@ -474,5 +598,16 @@ else
         }
     }
 
+    private void CloseImageDetailDialog(MouseEventArgs e)
+    {
+        isShowImageDetailDialog = false;
+    }
+
+    private void ShowImageDetailDialog(string imageUrl)
+    {
+        isShowImageDetailDialog = true;
+        selectedImageURL = imageUrl;
+    }
     #endregion
+      
 }

@@ -28,6 +28,6 @@ namespace ProjectAssistant1.Models.WorkspaceModel
         [JsonIgnore]
         public virtual IEnumerable<UserWork> UserWorks { get; set; }
         [JsonIgnore]
-        public virtual ICollection<ChatRoom> ChatRooms { get; set; }
+        public virtual IEnumerable<ChatRoom> ChatRooms { get; set; }
     }
 }

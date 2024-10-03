@@ -30,12 +30,13 @@ namespace ProjectAssistant1.Models.Models.ChatModel
         {
         }
 
-        public Chat(string text, int chatRoomId, string userId)
+        public Chat(string text, int chatRoomId, string userId, bool isNotification)
         {
             this.Text = text;
             this.ChatRoomId = chatRoomId;
             this.UserId = userId;
             this.Created = DateTimeOffset.Now;
+            this.IsNotification = isNotification;
         }
 
         public Chat(string text)

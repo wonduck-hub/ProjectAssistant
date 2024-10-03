@@ -1,6 +1,7 @@
 ﻿@page "/WorkspaceDetail/{workspaceId:int}"
 @using System.Diagnostics
 @using BlazorDateRangePicker
+@using Microsoft.AspNetCore.SignalR.Client
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
@@ -490,6 +491,11 @@ else
 
     #endregion
 
+    #region chatHub
+    private HubConnection chatHubConnection; // SignalR 허브 연결용
+    ChatRoom notificationChatRoom = null;
+    #endregion
+
     AuthenticationState authState;
     ClaimsPrincipal user;
 
@@ -499,7 +505,7 @@ else
         // 현재 인증 상태를 나타내는 AuthenticationState 객체를 비동기적으로 반환하는 메서드다.
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         user = authState.User;
-
+        
         if (!user.Identity.IsAuthenticated)
         {
             // 로그인 안된 경우
@@ -507,6 +513,25 @@ else
         }
 
         workspace = await WorkspaceRepository.GetWorkspaceByIdAsync(WorkspaceId);
+
+        chatHubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+
+        await chatHubConnection.StartAsync();
+        var chatRooms = workspace.ChatRooms;
+        
+        foreach (var i in chatRooms)
+        {
+            if (i.IsNotification)
+            {
+                notificationChatRoom = i;
+            }
+        }
+        if (chatHubConnection.State == HubConnectionState.Connected)
+        {
+            await chatHubConnection.SendAsync("JoinRoom", notificationChatRoom);
+        }
 
         await ReloadData();
     }
@@ -563,6 +588,11 @@ else
         await UserWorkRepository.AddUserWorkAsync(newUserWork);
 
         selectedWorkMemberUserWork = await UserWorkRepository.GetUserWorkByWorkIdAsync(selectedWork.Id);
+
+        string message = 
+            $"{user.Identity.Name}님이 {selectedWork.Name} 작업에 {wu.User.UserName}님을 추가하였습니다.";
+        await chatHubConnection.SendAsync("SendMessageToChatRoom", notificationChatRoom, 
+            user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, message, true);
     }
 
     public async Task DeleteWorkMember(UserWork wu)
@@ -570,6 +600,11 @@ else
         await UserWorkRepository.RemoveUserWorkAsync(wu.UserId, wu.WorkId, wu.WorkspaceId);
 
         selectedWorkMemberUserWork = await UserWorkRepository.GetUserWorkByWorkIdAsync(selectedWork.Id);
+
+        string message =
+            $"{user.Identity.Name}님이 {selectedWork.Name} 작업에 {wu.User.UserName}님을 제거하였습니다.";
+        await chatHubConnection.SendAsync("SendMessageToChatRoom", notificationChatRoom,
+            user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, message, true);
     }
     #endregion
 

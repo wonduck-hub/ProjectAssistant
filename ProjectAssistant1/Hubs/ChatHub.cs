@@ -21,11 +21,11 @@ namespace ProjectAssistant1.Hubs
             _context = context;
         }
 
-        public async Task SendMessageToChatRoom(ChatRoom selectedChatRoom, string userId, string userInput)
+        public async Task SendMessageToChatRoom(ChatRoom selectedChatRoom, string userId, string userInput, bool isNotification)
         {
             Debug.WriteLine("SendMessage");
             Debug.WriteLine(selectedChatRoom.Id.ToString());
-            Chat chatMessage = new Chat(userInput, selectedChatRoom.Id, userId);
+            Chat chatMessage = new Chat(userInput, selectedChatRoom.Id, userId, isNotification);
 
             ChatRepository cr = new ChatRepository(_context);
             await cr.AddChatAsync(chatMessage, userId, selectedChatRoom);
@@ -37,7 +37,7 @@ namespace ProjectAssistant1.Hubs
         {
             Debug.WriteLine("SendImage");
             Debug.WriteLine(selectedChatRoom.Id.ToString());
-            Chat chatMessage = new Chat(Url, selectedChatRoom.Id, userId);
+            Chat chatMessage = new Chat(Url, selectedChatRoom.Id, userId, false);
             chatMessage.IsImage = true;
 
             ChatRepository cr = new ChatRepository(_context);

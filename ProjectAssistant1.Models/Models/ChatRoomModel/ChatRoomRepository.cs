@@ -28,9 +28,15 @@ namespace ProjectAssistant1.Models.Models.ChatRoomModel
             return cr;
         }
 
-        public Task DeleteChatRoomById(int id)
+        public async Task DeleteChatRoomById(int id)
         {
-            throw new NotImplementedException();
+            Debug.Assert(id > 0, id + " is not a valid id");
+
+            ChatRoom cr = this._context.ChatRooms.Find(id);
+            cr.IsDeleted = true;
+            _context.ChatRooms.Update(cr);
+            await _context.SaveChangesAsync();
+
         }
 
         public Task<List<ChatRoom>> GetChatRoomByCreateUserId(string userId)
