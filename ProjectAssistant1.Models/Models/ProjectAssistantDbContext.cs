@@ -11,6 +11,7 @@ using ProjectAssistant1.Models.Models.UserWorkModel;
 using ProjectAssistant1.Models.Models.WorkspaceWorkModel;
 using ProjectAssistant1.Models.Models.ChatModel;
 using ProjectAssistant1.Models.Models.ChatRoomModel;
+using ProjectAssistant1.Models.Models.VotModel;
 
 namespace ProjectAssistant1.Models
 {
@@ -88,6 +89,12 @@ namespace ProjectAssistant1.Models
                 .HasOne(c => c.User)
                 .WithMany(u => u.Chats)
                 .HasForeignKey(c => c.UserId);
+
+            // Vot과 Workspace의 다대일 관계 설정
+            modelBuilder.Entity<Vot>()
+                .HasOne(v => v.Workspace)
+                .WithMany(w => w.Vots)
+                .HasForeignKey(v => v.WorkspaceId);
         }
 
 
@@ -113,5 +120,7 @@ namespace ProjectAssistant1.Models
         public DbSet<ChatRoom> ChatRooms { get; set; }
 
         public DbSet<Chat> Chats { get; set; }
+
+        public DbSet<Vot> Vots { get; set; }
     }
 }

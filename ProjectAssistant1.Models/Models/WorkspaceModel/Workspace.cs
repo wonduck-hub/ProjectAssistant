@@ -1,5 +1,6 @@
 ﻿using ProjectAssistant1.Models.Models.ChatRoomModel;
 using ProjectAssistant1.Models.Models.UserWorkModel;
+using ProjectAssistant1.Models.Models.VotModel;
 using ProjectAssistant1.Models.Models.WorkspaceUserModel;
 using ProjectAssistant1.Models.Models.WorkspaceWorkModel;
 using System;
@@ -29,5 +30,7 @@ namespace ProjectAssistant1.Models.WorkspaceModel
         public virtual IEnumerable<UserWork> UserWorks { get; set; }
         [JsonIgnore]
         public virtual IEnumerable<ChatRoom> ChatRooms { get; set; }
+        [JsonIgnore]
+        public virtual IEnumerable<Vot> Vots{ get; set; }
     }
 }

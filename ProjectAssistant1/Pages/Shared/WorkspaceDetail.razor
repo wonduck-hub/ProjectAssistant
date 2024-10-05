@@ -244,7 +244,8 @@ else
                         </ul>
                         <br />
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" @bind="selectedWork.IsSuccess" />
+                            <input class="form-check-input" type="checkbox"
+                                   @bind="selectedWork.IsSuccess" @onclick="( () => SuccessWork(selectedWork) )" />
                             <label class="form-check-label" >완료</label>
                         </div>
                     }
@@ -252,8 +253,8 @@ else
                 <div class="modal-footer">
                     @if (workspaceUser.TaskCreationPermission)
                     {
-                        <button type="button" class="btn btn-danger" @onclick="@( () => DeleteWorkDialogButton() )">Delete</button>
                         <button type="button" class="btn btn-success" @onclick="@( () => UpdateWorkDialogButton() )">Save</button>
+                        <button type="button" class="btn btn-danger" @onclick="@( () => DeleteWorkDialogButton() )">Delete</button>
                     }
                     <button type="button" class="btn btn-secondary" @onclick="CloseWorkDetailDialogButton">Close</button>
                 </div>
@@ -735,6 +736,16 @@ else
         newWork = new Work();
         isShowAddWorkDialog = false;
     }
+
+    private async Task SuccessWork(Work w)
+    {
+        if (!w.IsSuccess)
+        {
+            string message = $"{w.Name}작업을 완료 했습니다.";
+            await chatHubConnection.SendAsync("SendMessageToChatRoom", notificationChatRoom,
+                user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, message, true);
+        }
+    }
     #endregion
 
     #region AddUser
@@ -758,8 +769,13 @@ else
         Debug.Assert(searchedUser != null);
         Debug.Assert(searchedUser.Id != null);
 
-        WorkspaceUser wu = new WorkspaceUser(searchedUser.Id, WorkspaceId, true, false);
+        WorkspaceUser wu = new WorkspaceUser(searchedUser.Id, WorkspaceId, searchedUserUserInvitationPermission, searchedUserTaskCreationPermission);
         await WorkspaceUserRepository.AddWorkspaceUserAsync(wu);
+
+        string message =
+            $"{user.Identity.Name}님이 {searchedUser.UserName}님을 초대 했습니다.";
+        await chatHubConnection.SendAsync("SendMessageToChatRoom", notificationChatRoom,
+            user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, message, true);
 
         searchedUser = null;
 
@@ -772,6 +788,11 @@ else
     {
         Debug.Assert(searchedUser != null);
         Debug.Assert(searchedUser.Id != null);
+
+        string message =
+            $"{user.Identity.Name}님이 {searchedUser.UserName}님을 퇴장 시켰습니다.";
+        await chatHubConnection.SendAsync("SendMessageToChatRoom", notificationChatRoom,
+            user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, message, true);
 
         await WorkspaceUserRepository.RemoveWorkspaceUserAsync(searchedUser.Id, WorkspaceId);
 

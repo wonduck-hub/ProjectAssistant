@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using ProjectAssistant1.Models.Models.ChatRoomModel;
 using ProjectAssistant1.Models.Models.ChatModel;
 using System.Text.Json.Serialization;
+using ProjectAssistant1.Models.Models.VotModel;
 
 namespace ProjectAssistant1
 {
@@ -83,6 +84,7 @@ namespace ProjectAssistant1
             services.AddTransient<IWorkspaceWorkRepository, WorkspaceWorkRepository>();
             services.AddTransient<IChatRoomRepository, ChatRoomRepository>();
             services.AddTransient<IChatRepository, ChatRepository>();
+            services.AddTransient<IVotRepository, VotRepository>();
 
             // SignalR and Response Compression
             services.AddSignalR();
