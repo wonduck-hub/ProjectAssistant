@@ -12,6 +12,7 @@
 @inject IWorkspaceUserRepository WorkspaceUserRepository
 @inject IChatRoomRepository ChatRoomRepository
 @inject NavigationManager NavigationManager
+@inject IVotRepository VotRepository
 
 <h1>Chat</h1>
 <hr />
@@ -40,6 +41,10 @@ else
         <div class="top-row px-4 auth">
             @if (workspaceUser.TaskCreationPermission)
             {
+                <button type="button" class="btn btn-primary" style="margin-right:auto"
+                @onclick="ShowAddVotDialog">
+                    Add vot
+                </button>
                 <button type="button" class="btn btn-primary" style="margin-right:10px" 
                 @onclick="ShowAddChatRoomDialogButton">Add new ChatRoom</button>
                 <button type="button" class="btn btn-danger"
@@ -189,6 +194,30 @@ else
                         </div>
                     </div>
                     <br />
+                    <!--튜표 리스트-->
+                    <h5 class="font-weight-bold mb-3 text-center text-lg-start">vots</h5>
+                    <div class="card">
+                        <div class="card-body">
+
+                            <ul class="list-unstyled mb-0">
+                                @foreach (var vot in selectedWorkspace.Vots)
+                                {
+                                    @if (!vot.IsDeleted){
+                                        <li class="p-2 border-bottom bg-body-tertiary">
+                                            <div class="d-flex flex-row">
+                                                <div class="pt-1" style="text-align:center">
+                                                    <p class="fw-bold mb-0"><Icon Name="IconName.Flag"></Icon> @vot.Name</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+
+                            </ul>
+
+                        </div>
+                    </div>
+                    <br />
                     <!--유저 리스트-->
                     <h5 class="font-weight-bold mb-3 text-center text-lg-start">users</h5>
                     <div class="card">
@@ -325,7 +354,32 @@ else
     }
 }
 
-
+@if (isShowAddVotDialog)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail</h5>
+                </div>
+                <div class="modal-body">
+                    <label>작업 이름:</label>
+                    <input type="text" @bind="newVotName" />
+                    <br />
+                    <label>설명:</label>
+                    <br />
+                    <textarea @bind="@newVotDetailText" rows="5" cols="35" placeholder="Detail..." style="resize:none;"></textarea>
+                    <br />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" @onclick="UpdateVotButton">Save</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseVotDialogButton">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
 
 @code {
     private HubConnection hubConnection; // SignalR 허브 연결용
@@ -350,6 +404,13 @@ else
     private string selectedImageURL = string.Empty;
 
     private ChatRoom newChatRoom = new ChatRoom();
+
+    #region 투표 기능 변수들
+    private Workspace selectedWorkspace = null;
+    private bool isShowAddVotDialog = false;
+    private string newVotName = string.Empty;
+    private string newVotDetailText = string.Empty;
+    #endregion
 
     AuthenticationState authState;
     ClaimsPrincipal user;
@@ -418,6 +479,7 @@ else
     protected async Task OnWorkspaceChanged(ChangeEventArgs e)
     {
         selectedWorkspaceId = int.Parse(e.Value.ToString());
+        selectedWorkspace = await WorkspaceRepository.GetWorkspaceByIdAsync(selectedWorkspaceId);
         selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
 
         await LoadChatServiceAsync();
@@ -430,6 +492,7 @@ else
         if (workspaceUserList.Count > 0)
         {
             selectedWorkspaceId = workspaceUserList[0].WorkspaceId;
+            selectedWorkspace = await WorkspaceRepository.GetWorkspaceByIdAsync(selectedWorkspaceId);
             selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
         }
 
@@ -505,7 +568,27 @@ else
     }
     #endregion
 
+    #region 투표 함수
+    private void ShowAddVotDialog(MouseEventArgs e)
+    {
+        isShowAddVotDialog = true;
+    }
 
+    private void CloseVotDialogButton(MouseEventArgs e)
+    {
+        isShowAddVotDialog = false;
+    }
+
+    private async Task UpdateVotButton(MouseEventArgs e)
+    {
+        Vot v = new Vot(newVotName, newVotDetailText, DateTimeOffset.Now, selectedWorkspace);
+        await VotRepository.AddVotAsync(v);
+
+        newVotName = string.Empty;
+        newVotDetailText = string.Empty;
+        isShowAddVotDialog = false;
+    }
+    #endregion
 
     #region SignalR 함수
     // 사용법 공부하면서 사용
@@ -540,6 +623,7 @@ else
 
         }
     }
+
     #endregion
 
     #region 이미지 업로드 관련 함수
@@ -609,5 +693,5 @@ else
         selectedImageURL = imageUrl;
     }
     #endregion
-      
+         
 }

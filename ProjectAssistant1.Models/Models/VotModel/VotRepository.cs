@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Build.Framework;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +19,12 @@ namespace ProjectAssistant1.Models.Models.VotModel
 
         public async Task<Vot> AddVotAsync(Vot v)
         {
-            throw new NotImplementedException();
+            Debug.Assert(v != null, "work is null");
+
+            _context.Vots.Add(v);
+            await _context.SaveChangesAsync();
+
+            return v;
         }
 
         public async Task<List<Vot>> GetVotByWorkspaceIdAsync(int w)

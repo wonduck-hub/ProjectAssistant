@@ -1903,10 +1903,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="asdf\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ProjectAssistant1.Models\ProjectAssistant1.Models.csproj" />
   </ItemGroup>
 

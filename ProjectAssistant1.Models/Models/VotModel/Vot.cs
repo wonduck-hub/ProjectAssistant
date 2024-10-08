@@ -17,11 +17,24 @@ namespace ProjectAssistant1.Models.Models.VotModel
         public DateTimeOffset? Created { get; set; }
         public DateTimeOffset? Modified { get; set; }
         public bool IsDeleted { get; set; }
-        public bool IsNotification { get; set; }
         public int WorkspaceId { get; set; }
 
         // Navigation property for the Workspace foreign key
         [JsonIgnore]
         virtual public Workspace Workspace { get; set; }
+
+        public Vot()
+        {
+
+        }
+
+        public Vot(string name, string detailText, DateTimeOffset? created, Workspace w)
+        {
+            Name = name;
+            DetailText = detailText;
+            Created = created;
+            WorkspaceId = w.Id;
+            Workspace = w;
+        }
     }
 }
