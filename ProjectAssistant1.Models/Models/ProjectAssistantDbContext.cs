@@ -12,6 +12,7 @@ using ProjectAssistant1.Models.Models.WorkspaceWorkModel;
 using ProjectAssistant1.Models.Models.ChatModel;
 using ProjectAssistant1.Models.Models.ChatRoomModel;
 using ProjectAssistant1.Models.Models.VotModel;
+using ProjectAssistant1.Models.Models.VotesModel;
 
 namespace ProjectAssistant1.Models
 {
@@ -122,5 +123,7 @@ namespace ProjectAssistant1.Models
         public DbSet<Chat> Chats { get; set; }
 
         public DbSet<Vot> Vots { get; set; }
+
+        public DbSet<Votes> Votes { get; set; }
     }
 }

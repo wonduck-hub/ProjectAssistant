@@ -699,13 +699,9 @@ else
 
     private async Task UpdateWorkDialogButton()
     {
-        if (selectedWork.IsSuccess && selectedWork.SuccessDate == null)
+        if (selectedWork.IsSuccess)
         {
             selectedWork.SuccessDate = DateTimeOffset.Now;
-        }
-        else if (!selectedWork.IsSuccess)
-        {
-            selectedWork.SuccessDate = null;
         }
         else
         {

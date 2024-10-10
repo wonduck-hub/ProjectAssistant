@@ -1,4 +1,25 @@
-﻿
+﻿.blue-square {
+    width: 10px;
+    height: 10px;
+    background-color: blue;
+    display: inline-block;
+}
+.red-square {
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    display: inline-block;
+}
+.gray-square {
+    width: 10px;
+    height: 10px;
+    background-color: gray;
+    display: inline-block;
+}
+.inline-text {
+    display: inline-block;
+    vertical-align: middle; /* 선택 사항: 텍스트를 네모와 수직으로 정렬 */
+}
 
 .top-row {
     border-bottom: 1px solid #d6d5d5;
