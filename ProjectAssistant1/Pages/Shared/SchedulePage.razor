@@ -1,7 +1,102 @@
 ﻿@page "/SchedulePage"
 
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Diagnostics
+@using System.IO
+@using OpenCvSharp
+@using BlazorScheduler
+
+@inject IJSRuntime JSRuntime
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IWorkspaceRepositoryAsync WorkspaceRepository
+@inject IWorkspaceUserRepository WorkspaceUserRepository
+@inject IChatRoomRepository ChatRoomRepository
+@inject NavigationManager NavigationManager
+@inject IVotRepository VotRepository
+@inject IVotesRepository VotesRepository
+@inject IUserRepositoryAsync UserRepository
+@inject IUserWorkRepository UserWorkRepository
+
 <h1>Schedule</h1>
 
+<hr />
+
+<Scheduler EnableRescheduling="true">
+    <Appointments>
+        @foreach (var app in _appointments)
+        {
+            <Appointment 
+                Start="@app.Start" End="@app.End" Color="@app.Color">
+                @app.Class
+            </Appointment>
+        }
+    </Appointments>
+</Scheduler>
 @code {
 
+    AuthenticationState authState;
+    ClaimsPrincipal user;
+
+    #region 변수들
+    private User thisUser;
+    #endregion
+
+    #region 일정 관련 변수들
+    private List<Appointment> _appointments = new();
+
+    #endregion
+
+    protected override async Task OnInitializedAsync()
+    {
+        // AuthenticationStateProvider.GetAuthenticationStateAsync() 메서드는
+        // 현재 인증 상태를 나타내는 AuthenticationState 객체를 비동기적으로 반환하는 메서드다.
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            // 로그인 안된 경우
+            NavigationManager.NavigateTo("Identity/Account/Login");
+        }
+
+        thisUser = await UserRepository.GetUserByIdAsync(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+
+        await LoadUserWorkspacesWorks();
+    }
+
+    private async Task LoadUserWorkspacesWorks()
+    {
+        // Workspace에서 할당된 작업들 로드
+        List<UserWork> userWorks = await UserWorkRepository.GetUserWorkByUserIdAsync(thisUser.Id);
+
+        foreach (UserWork userWork in userWorks)
+        {
+            if (!userWork.Work.IsDeleted)
+            {
+                Appointment app = new()
+                    {
+                        Start = userWork.Work.StartDate.Value.UtcDateTime,
+                        End = userWork.Work.EndDate.Value.UtcDateTime,
+                        Class = userWork.Work.Name,
+                        Color = "aqua"
+                    };
+                _appointments.Add(app);
+            }
+        }
+    }
+
+    // Task OnAddingNewAppointment(DateTime start, DateTime end)
+    // {
+    //     _appointments.Add(new AppointmentDto { Start = start, End = end, Title = "A newly added appointment!", Color = "aqua" });
+    //     return Task.CompletedTask;
+    // }
+
+    // Task HandleReschedule(AppointmentDto appointment, DateTime newStart, DateTime newEnd)
+    // {
+    //     appointment.Start = newStart;
+    //     appointment.End = newEnd;
+
+    //     return Task.CompletedTask;
+    // }
 }
