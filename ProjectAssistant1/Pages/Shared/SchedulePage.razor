@@ -70,33 +70,25 @@
         // Workspace에서 할당된 작업들 로드
         List<UserWork> userWorks = await UserWorkRepository.GetUserWorkByUserIdAsync(thisUser.Id);
 
+        string[] colors = { "aqua", "fuchsia", "green", "yellow", "red", "silver" };
+        int i = 0;
+
         foreach (UserWork userWork in userWorks)
         {
             if (!userWork.Work.IsDeleted)
             {
-                Appointment app = new()
+                MyAppointment app = new()
                     {
                         Start = userWork.Work.StartDate.Value.UtcDateTime,
                         End = userWork.Work.EndDate.Value.UtcDateTime,
                         Class = userWork.Work.Name,
-                        Color = "aqua"
+                        Color = colors[i % colors.Length],
+                        IsWorkspaceWork = true
                     };
                 _appointments.Add(app);
             }
+            ++i;
         }
     }
 
-    // Task OnAddingNewAppointment(DateTime start, DateTime end)
-    // {
-    //     _appointments.Add(new AppointmentDto { Start = start, End = end, Title = "A newly added appointment!", Color = "aqua" });
-    //     return Task.CompletedTask;
-    // }
-
-    // Task HandleReschedule(AppointmentDto appointment, DateTime newStart, DateTime newEnd)
-    // {
-    //     appointment.Start = newStart;
-    //     appointment.End = newEnd;
-
-    //     return Task.CompletedTask;
-    // }
 }
