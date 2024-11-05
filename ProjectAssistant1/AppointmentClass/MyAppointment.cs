@@ -8,8 +8,13 @@ using BlazorScheduler;
 
 namespace ProjectAssistant1.AppointmentClass
 {
-    public class MyAppointment : Appointment
+    public class MyAppointment
     {
+        public string Title { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public string Color { get; set; }
+        public string? Class { get; set; }
         public bool IsWorkspaceWork { get; set; }
 
     }

@@ -6,6 +6,7 @@
 @using OpenCvSharp
 @using BlazorScheduler
 @using BlazorDateRangePicker
+@using MudBlazor
 
 @inject IJSRuntime JSRuntime
 
@@ -19,6 +20,7 @@
 @inject IUserRepositoryAsync UserRepository
 @inject IUserWorkRepository UserWorkRepository
 @inject IPersonalScheduleRepository PersonalScheduleRepository
+@inject IDialogService DialogService
 
 <h1>Schedule</h1>
 
@@ -26,11 +28,11 @@
 <br />
 <hr />
 
-<Scheduler EnableRescheduling="true">
+<Scheduler EnableRescheduling="false">
     <Appointments>
         @foreach (var app in _appointments)
         {
-            <Appointment Start="@app.Start" End="@app.End" Color="@app.Color">
+            <Appointment Start="@app.Start" End="@app.End" Color="@app.Color" OnClick="() => ShowScheduleDetail(app)">
                 @app.Class
             </Appointment>
         }
@@ -66,6 +68,37 @@
     <div class="modal-backdrop show"></div>
 }
 
+@if (isShowScheduleDetail)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail</h5>
+                </div>
+                <div class="modal-body">
+                    <label>작업 이름:</label>
+                    <input type="text"/>
+                    <br />
+                    <label>기간:</label>
+                    <DateRangePicker/>
+                    <br />
+                    <label>설명:</label>
+                    <br />
+                    <textarea rows="5" cols="35" placeholder="Detail..." style="resize:none;"></textarea>
+                    <br />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" @onclick="UpdateScheduleDialogButton">Save</button>
+                    <button type="button" class="btn btn-danger" @onclick="DeleteScheculeDialogButton">Delete</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseScheduleDetailDialogButton">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
+
 @code {
 
     AuthenticationState authState;
@@ -76,10 +109,12 @@
     #endregion
 
     #region 일정 관련 변수들
-    private List<Appointment> _appointments = new();
+    private List<MyAppointment> _appointments = new();
     private bool isShowAddScheduleDialog = false;
 
     private PersonalSchedule newPersonalSchedule = new();
+
+    private bool isShowScheduleDetail = false;
     #endregion
 
     protected override async Task OnInitializedAsync()
@@ -138,7 +173,7 @@
                         End = s.EndDate.Value.UtcDateTime,
                         Class = s.Name,
                         Color = colors[i % colors.Length],
-                        IsWorkspaceWork = true
+                        IsWorkspaceWork = false
                     };
                 _appointments.Add(app);
             }
@@ -151,6 +186,7 @@
     {
         isShowAddScheduleDialog = true;
     }
+
     private async Task AddScheduleButton(MouseEventArgs e)
     {
         newPersonalSchedule.UserId = thisUser.Id;
@@ -162,9 +198,37 @@
 
         await LoadSchedules();
     }
+
     private void CloseAddScheduleDialogButton(MouseEventArgs e)
     {
         isShowAddScheduleDialog = false;
     }
+
+    async Task ShowScheduleDetail(MyAppointment p)
+    {
+        var dialog = DialogService.Show<EditAppointmentDialog>("Edit Appointment", new DialogParameters
+            {
+                ["Appointment"] = p,
+            });
+        await dialog.Result;
+
+        StateHasChanged();
+    }
+
+    private void CloseScheduleDetailDialogButton(MouseEventArgs e)
+    {
+        isShowScheduleDetail = false;
+    }
+
+    private void DeleteScheculeDialogButton(MouseEventArgs e)
+    {
+        isShowScheduleDetail = false;
+    }
+
+    private void UpdateScheduleDialogButton(MouseEventArgs e)
+    {
+        isShowScheduleDetail = false;
+    }
     #endregion
+    
 }

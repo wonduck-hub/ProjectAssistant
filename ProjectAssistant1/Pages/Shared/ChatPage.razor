@@ -20,7 +20,7 @@
 <hr />
 <br />
 
-@if(workspaceUserList.Count == 0)
+@if (workspaceUserList.Count == 0)
 {
     <div>포함되어 있는 워크스페이스가 없습니다.</div>
 }
@@ -44,13 +44,17 @@ else
             @if (workspaceUser.TaskCreationPermission)
             {
                 <button type="button" class="btn btn-primary" style="margin-right:auto"
-                @onclick="ShowAddVotDialog">
+                        @onclick="ShowAddVotDialog">
                     Add vote
                 </button>
-                <button type="button" class="btn btn-primary" style="margin-right:10px" 
-                @onclick="ShowAddChatRoomDialogButton">Add new ChatRoom</button>
+                <button type="button" class="btn btn-primary" style="margin-right:10px"
+                        @onclick="ShowAddChatRoomDialogButton">
+                    Add new ChatRoom
+                </button>
                 <button type="button" class="btn btn-danger"
-                @onclick="ShowDeleteChatRoomDialog">Delete ChatRoom</button>
+                        @onclick="ShowDeleteChatRoomDialog">
+                    Delete ChatRoom
+                </button>
             }
         </div>
     }
@@ -64,28 +68,28 @@ else
 
                 <!--채팅 리스트-->
                 <div class="col-md-6 col-lg-7 col-xl-8" id="chat-container">
-                    @if (selectedChatRoom != null )
+                    @if (selectedChatRoom != null)
                     {
                         <h5 class="font-weight-bold mb-3 text-center text-lg-start">@selectedChatRoom.Name</h5>
-                        <ul class="list-unstyled" 
-                        style="max-height: 50vh; overflow-y:auto; display:flex; flex-direction: column-reverse;">
+                        <ul class="list-unstyled"
+                            style="max-height: 50vh; overflow-y:auto; display:flex; flex-direction: column-reverse;">
                             @foreach (Chat c in messages)
                             {
                                 <li class="d-flex justify-content-start mb-4">
-                                    @if (!c.IsNotification) 
+                                    @if (!c.IsNotification)
                                     {
                                         <img src="/images/default-user-icon.png" alt="avatar"
                                              class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="30">
-                                    }   
-                                     
+                                    }
+
                                     @if (c.IsNotification)
                                     {
                                         <div class="card" style="width:100%;">
                                             <div class="card-header d-flex justify-content-center p-3"
-                                                    style="min-width:200px; width:auto; padding:0.5rem !important;">
+                                                 style="min-width:200px; width:auto; padding:0.5rem !important;">
                                                 <p class="fw-bold mb-0">공지</p>
                                                 <p class="text-muted small mb-0" style="text-align: left; font-size: 12px; align-items: flex-end;">
-                                                
+
                                                 </p>
                                             </div>
                                             @if (c.IsImage)
@@ -93,7 +97,7 @@ else
                                                 <div class="card-body">
                                                     <p class="mb-0">
                                                         <img src="@c.Text" alt="@c.Text" width="200" height="200"
-                                                                @onclick="@(() => ShowImageDetailDialog(c.Text))" />
+                                                             @onclick="@(() => ShowImageDetailDialog(c.Text))" />
                                                     </p>
                                                 </div>
                                             }
@@ -110,8 +114,8 @@ else
                                     else
                                     {
                                         <div class="card">
-                                            <div class="card-header d-flex justify-content-between p-3" 
-                                                style="min-width:200px; width:auto; padding:0.5rem !important;">
+                                            <div class="card-header d-flex justify-content-between p-3"
+                                                 style="min-width:200px; width:auto; padding:0.5rem !important;">
                                                 <p class="fw-bold mb-0">@c.User.UserName</p>
                                                 <p class="text-muted small mb-0" style="text-align: left; font-size: 12px; align-items: flex-end;">
                                                     <i class="far fa-clock">
@@ -123,11 +127,11 @@ else
                                                 <div class="card-body">
                                                     <p class="mb-0">
                                                         <img src="@c.Text" alt="@c.Text" width="200" height="200"
-                                                            @onclick="@(() => ShowImageDetailDialog(c.Text))"/>
+                                                             @onclick="@(() => ShowImageDetailDialog(c.Text))" />
                                                     </p>
                                                 </div>
                                             }
-                                            else 
+                                            else
                                             {
                                                 <div class="card-body">
                                                     <p class="mb-0">
@@ -137,7 +141,7 @@ else
                                             }
                                         </div>
                                     }
-                                    
+
                                 </li>
                             }
                         </ul>
@@ -147,18 +151,18 @@ else
                                 +
                             </button>
                             <textarea class="form-control bg-body-tertiary" id="textAreaExample2" rows="1" @bind="userInput">
-                            </textarea>
+                                    </textarea>
                             <button type="button" @onclick="SendMessage"
                                     data-mdb-button-init data-mdb-ripple-init class="btn btn-info btn-rounded float-end">
                                 Send
                             </button>
                         </div>
                     }
-                    else 
+                    else
                     {
                         <h5 class="font-weight-bold mb-3 text-center text-lg-start">채팅방을 선택해 주세요</h5>
                     }
-                    
+
 
                 </div>
 
@@ -172,21 +176,21 @@ else
                             <ul class="list-unstyled mb-0">
                                 @if (chatRoomList != null)
                                 {
-                                    @foreach(var chatRoom in chatRoomList)
+                                    @foreach (var chatRoom in chatRoomList)
                                     {
                                         @if (!chatRoom.IsDeleted)
                                         {
                                             <li class="p-2 border-bottom bg-body-tertiary" @onclick="() => ClickChatRoom(chatRoom)">
-                                            <div class="d-flex flex-row" style="align-items:center;">
+                                                <div class="d-flex flex-row" style="align-items:center;">
                                                     <div class="pt-1">
-                                                    <p class="fw-bold mb-0"><Icon Name="IconName.ChatLeftDots"></Icon> @chatRoom.Name</p>
-                                                    @* <p class="small text-muted">Hello, Are you there?</p> *@
+                                                        <p class="fw-bold mb-0"><Icon Name="IconName.ChatLeftDots"></Icon> @chatRoom.Name</p>
+                                                        @* <p class="small text-muted">Hello, Are you there?</p> *@
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            @* <div class="pt-1">
-                                                <p class="small text-muted mb-1">Just now</p>
-                                                <span class="badge bg-danger float-end">1</span>
-                                            </div> *@
+                                                @* <div class="pt-1">
+                                <p class="small text-muted mb-1">Just now</p>
+                                <span class="badge bg-danger float-end">1</span>
+                                </div> *@
                                             </li>
                                         }
                                     }
@@ -204,7 +208,8 @@ else
                             <ul class="list-unstyled mb-0">
                                 @foreach (var vot in selectedWorkspace.Vots)
                                 {
-                                    @if (!vot.IsDeleted){
+                                    @if (!vot.IsDeleted)
+                                    {
                                         <li class="p-2 border-bottom bg-body-tertiary" @onclick="(e) => ShowVotDetail(e, vot)">
                                             <div class="d-flex flex-row">
                                                 <div class="pt-1" style="text-align:center">
@@ -226,19 +231,19 @@ else
                         <div class="card-body">
 
                             <ul class="list-unstyled mb-0">
-                                @foreach(var workspaceUser in selectedWorkspaceUsers)
+                                @foreach (var workspaceUser in selectedWorkspaceUsers)
                                 {
                                     <li class="p-2 border-bottom bg-body-tertiary">
                                         <div class="d-flex flex-row">
                                             <img src="/images/default-user-icon.png" alt="avatar"
-                                                    class="rounded-circle d-flex align-self-center me-3 shadow-1-strong" width="25">
+                                                 class="rounded-circle d-flex align-self-center me-3 shadow-1-strong" width="25">
                                             <div class="pt-1" style="text-align:center">
                                                 <p class="fw-bold mb-0">@workspaceUser.User.UserName</p>
                                             </div>
                                         </div>
                                     </li>
                                 }
-                            
+
                             </ul>
 
                         </div>
@@ -320,7 +325,7 @@ else
                     </div>
                     <div class="modal-body">
                         <label>file:</label><br />
-                        <InputFile OnChange="SelectedImageFile"/>
+                        <InputFile OnChange="SelectedImageFile" />
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @onclick="CloseUploadImageDialog">Close</button>
@@ -345,7 +350,7 @@ else
                 </div>
                 <div class="card-body" style=" overflow:auto;">
                     <p class="mb-0">
-                        <img src="@selectedImageURL" alt="@selectedImageURL" style="max-width:100%; max-height:100%; width:auto; height:auto;"/>
+                        <img src="@selectedImageURL" alt="@selectedImageURL" style="max-width:100%; max-height:100%; width:auto; height:auto;" />
                     </p>
                 </div>
                 <br />
@@ -398,7 +403,7 @@ else
                     <Progress Class="mb-3">
                         <ProgressBar @ref="agreeProgressBar" Color="ProgressColor.Primary" />
                         <ProgressBar @ref="undecidedProgressBar" Color="ProgressColor.Secondary" />
-                        <ProgressBar @ref="disagreeProgressBar"Color="ProgressColor.Danger"/>
+                        <ProgressBar @ref="disagreeProgressBar" Color="ProgressColor.Danger" />
                     </Progress>
                     <br />
                     <div class="blue-square"></div> <div class="inline-text"> 찬성</div>
@@ -473,6 +478,7 @@ else
         {
             // 로그인 안된 경우
             NavigationManager.NavigateTo("Identity/Account/Login");
+            return;
         }
 
         hubConnection = new HubConnectionBuilder()
@@ -534,7 +540,7 @@ else
 
     protected async Task LoadWorkspaceUserAsync()
     {
-        workspaceUserList = 
+        workspaceUserList =
             await WorkspaceUserRepository.GetWorkspaceUserByUserId(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
         if (workspaceUserList.Count > 0)
         {
@@ -543,10 +549,9 @@ else
             selectedWorkspaceUsers = await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceId((int)selectedWorkspaceId);
         }
 
-        workspaceUser = 
+        workspaceUser =
             await WorkspaceUserRepository.GetWorkspaceUserByWorkspaceIdUserId(
                 user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, selectedWorkspaceId);
-
 
         await LoadChatServiceAsync();
     }
@@ -566,7 +571,7 @@ else
 
     protected async Task AddChatRoomDialogButton()
     {
-        if (    newChatRoom.Name == null)
+        if (newChatRoom.Name == null)
         {
             newChatRoom.Name = "미정";
         }
@@ -741,8 +746,8 @@ else
         {
             if (!string.IsNullOrEmpty(userInput))
             {
-                await hubConnection.SendAsync("SendMessageToChatRoom", 
-                    selectedChatRoom, user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value,  userInput, false);
+                await hubConnection.SendAsync("SendMessageToChatRoom",
+                    selectedChatRoom, user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value, userInput, false);
                 Debug.WriteLine(messages.Count);
                 userInput = string.Empty;
             }
@@ -819,5 +824,5 @@ else
         selectedImageURL = imageUrl;
     }
     #endregion
-               
+
 }

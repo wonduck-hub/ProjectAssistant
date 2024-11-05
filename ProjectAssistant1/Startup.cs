@@ -33,6 +33,7 @@ using System.Text.Json.Serialization;
 using ProjectAssistant1.Models.Models.VotModel;
 using ProjectAssistant1.Models.Models.VotesModel;
 using ProjectAssistant1.Models.Models.PersonalScheduleModel;
+using MudBlazor.Services;
 
 namespace ProjectAssistant1
 {
@@ -68,6 +69,9 @@ namespace ProjectAssistant1
             // Blazor Bootstrap 추가
             services.AddBlazorBootstrap();
 
+            // MudBlazor 추가
+            services.AddMudServices();
+
             // new DbContext
             services.AddEntityFrameworkSqlServer()
             .AddDbContext<ProjectAssistantDbContext>(options =>
@@ -89,6 +93,21 @@ namespace ProjectAssistant1
             services.AddTransient<IVotRepository, VotRepository>();
             services.AddTransient<IVotesRepository, VotesRepository>();
             services.AddTransient<IPersonalScheduleRepository, PersonalScheduleRepository>();
+
+            services.AddScoped<IWorkspaceRepositoryAsync, WorkspaceRepository>();
+            services.AddScoped<IUserWorkspaceRepositoryAsync, UserWorkspaceRepository>();
+            services.AddScoped<IUserRepositoryAsync, UserRepository>();
+            services.AddScoped<IWorkspaceUserRepository, WorkspaceUserRepository>();
+            services.AddScoped<IWorkRepository, WorkRepository>();
+            services.AddScoped<IListWorkspaceRepository, ListWorkspaceRepository>();
+            services.AddScoped<IUserWorkRepository, UserWorkRepository>();
+            services.AddScoped<IWorkListRepository, WorkListRepository>();
+            services.AddScoped<IWorkspaceWorkRepository, WorkspaceWorkRepository>();
+            services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
+            services.AddScoped<IChatRepository, ChatRepository>();
+            services.AddScoped<IVotRepository, VotRepository>();
+            services.AddScoped<IVotesRepository, VotesRepository>();
+            services.AddScoped<IPersonalScheduleRepository, PersonalScheduleRepository>();
 
             // SignalR and Response Compression
             services.AddSignalR();
