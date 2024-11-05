@@ -33,11 +33,11 @@ else
         @if (workspaceUser.UserInvitationPermission)
         {
             <div style="margin-right:10px" @onclick="ShowAddUserDialog">
-                <img src="/images/plus-user.png" width="25" hight="25"/>
+                <img src="/images/plus-user.png" width="25" hight="25" />
                 Add user
             </div>
             <div style="margin-right:10px" @onclick="ShowUsersDialog">
-                <Icon Name="IconName.Wrench" Size="IconSize.x5"/>
+                <Icon Name="IconName.Wrench" Size="IconSize.x5" />
                 Users
             </div>
         }
@@ -78,7 +78,7 @@ else
                                 <input class="category-name" @onchange="@(e => UpdateCategory(e, item.Key))" value="@item.Key.Name" style="text-align: center;"></input>
                                 <img src="/images/trash.png" width="20" hight="20" @onclick="@( () => DeleteCategoryButton(item.Key) )"></img>
                             </div>
-                            
+
 
                             @if (item.Value == null)
                             {
@@ -101,7 +101,7 @@ else
                                     <tbody>
                                         @foreach (var v in item.Value)
                                         {
-                                            
+
                                             @if (!v.IsDeleted)
                                             {
                                                 workStatus = "오류";
@@ -123,7 +123,7 @@ else
                                                 else if (DateTime.Now < v.StartDate)
                                                 {
                                                     @if (workVisible[item.Key] == WorkVisibleType.BEFORE
-                                                    || workVisible[item.Key] == WorkVisibleType.ALL)
+                                                   || workVisible[item.Key] == WorkVisibleType.ALL)
                                                     {
                                                         workStatus = "작업 전";
                                                         workColor = "#c6cdd5";
@@ -136,7 +136,7 @@ else
                                                 else if (v.StartDate <= DateTime.Now && DateTime.Now <= v.EndDate)
                                                 {
                                                     @if (workVisible[item.Key] == WorkVisibleType.WORKING
-                                                    || workVisible[item.Key] == WorkVisibleType.ALL)
+                                                   || workVisible[item.Key] == WorkVisibleType.ALL)
                                                     {
                                                         workStatus = "작업 중";
                                                         workColor = "#fbc175";
@@ -149,7 +149,7 @@ else
                                                 else if (v.EndDate < DateTime.Now)
                                                 {
                                                     @if (workVisible[item.Key] == WorkVisibleType.TIME_OUT
-                                                    || workVisible[item.Key] == WorkVisibleType.ALL)
+                                                   || workVisible[item.Key] == WorkVisibleType.ALL)
                                                     {
                                                         workStatus = "기간 종료";
                                                         workColor = "#e66a7e";
@@ -165,7 +165,7 @@ else
                                                     workColor = "#ffffff";
                                                 }
 
-                                                
+
 
                                                 <tr @onclick="@( () => ShowWorkDetail(v) )">
                                                     <td class="table-name">@v.Name</td>
@@ -220,7 +220,7 @@ else
                     <input type="text" @bind="@selectedWork.Name" />
                     <br />
                     <label>기간:</label>
-                    <DateRangePicker @bind-StartDate="@selectedWork.StartDate" @bind-EndDate="@selectedWork.EndDate"/>
+                    <DateRangePicker @bind-StartDate="@selectedWork.StartDate" @bind-EndDate="@selectedWork.EndDate" />
                     <br />
                     <label>설명:</label>
                     <br />
@@ -246,7 +246,7 @@ else
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox"
                                    @bind="selectedWork.IsSuccess" @onclick="( () => SuccessWork(selectedWork) )" />
-                            <label class="form-check-label" >완료</label>
+                            <label class="form-check-label">완료</label>
                         </div>
                     }
                 </div>
@@ -299,7 +299,7 @@ else
                     <input type="text" @bind="newWork.Name" />
                     <br />
                     <label>작업 기간:</label>
-                    <DateRangePicker @bind-StartDate="newWork.StartDate" @bind-EndDate="newWork.EndDate"/>
+                    <DateRangePicker @bind-StartDate="newWork.StartDate" @bind-EndDate="newWork.EndDate" />
                     <br />
                     <label>설명:</label>
                     <br />
@@ -346,7 +346,7 @@ else
                     <input type="text" @onchange="@( e => SearchUser(e))" placeholder="Enter user name..." />
                     <br />
                     <hr />
-                    @if(searchedUser == null)
+                    @if (searchedUser == null)
                     {
                         <div>해당 이름의 유저 없음.</div>
                     }
@@ -416,11 +416,6 @@ else
     </div>
     <div class="modal-backdrop show"></div>
 }
-
-<!--
-    TODO:
-    완료시 완료 시간을 Work테이블에 함께 저장
--->
 
 @code {
     enum WorkVisibleType
@@ -506,7 +501,7 @@ else
         // 현재 인증 상태를 나타내는 AuthenticationState 객체를 비동기적으로 반환하는 메서드다.
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         user = authState.User;
-        
+
         if (!user.Identity.IsAuthenticated)
         {
             // 로그인 안된 경우
@@ -521,7 +516,7 @@ else
 
         await chatHubConnection.StartAsync();
         var chatRooms = workspace.ChatRooms;
-        
+
         foreach (var i in chatRooms)
         {
             if (i.IsNotification)
@@ -590,9 +585,9 @@ else
 
         selectedWorkMemberUserWork = await UserWorkRepository.GetUserWorkByWorkIdAsync(selectedWork.Id);
 
-        string message = 
+        string message =
             $"{user.Identity.Name}님이 {selectedWork.Name} 작업에 {wu.User.UserName}님을 추가하였습니다.";
-        await chatHubConnection.SendAsync("SendMessageToChatRoom", notificationChatRoom, 
+        await chatHubConnection.SendAsync("SendMessageToChatRoom", notificationChatRoom,
             user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, message, true);
     }
 
@@ -801,7 +796,7 @@ else
 
     private async Task SearchUser(ChangeEventArgs e)
     {
-        searchedUser =  await UserRepository.GetFirstUserByName(e.Value.ToString());
+        searchedUser = await UserRepository.GetFirstUserByName(e.Value.ToString());
 
         if (searchedUser == null)
         {

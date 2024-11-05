@@ -5,6 +5,7 @@
 @using System.IO
 @using OpenCvSharp
 @using BlazorScheduler
+@using BlazorDateRangePicker
 
 @inject IJSRuntime JSRuntime
 
@@ -17,22 +18,54 @@
 @inject IVotesRepository VotesRepository
 @inject IUserRepositoryAsync UserRepository
 @inject IUserWorkRepository UserWorkRepository
+@inject IPersonalScheduleRepository PersonalScheduleRepository
 
 <h1>Schedule</h1>
 
+<button type="button" class="btn btn-primary" @onclick="ShowAddScheduleDialogButton">Add schedule</button>
+<br />
 <hr />
 
 <Scheduler EnableRescheduling="true">
     <Appointments>
         @foreach (var app in _appointments)
         {
-            <Appointment 
-                Start="@app.Start" End="@app.End" Color="@app.Color">
+            <Appointment Start="@app.Start" End="@app.End" Color="@app.Color">
                 @app.Class
             </Appointment>
         }
     </Appointments>
 </Scheduler>
+
+@if (isShowAddScheduleDialog)
+{
+    <div class="modal fade show" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add new schedule</h5>
+                </div>
+                <div class="modal-body">
+                    <label>스케줄 이름:</label>
+                    <input type="text" @bind="newPersonalSchedule.Name" />
+                    <br />
+                    <label>기간:</label>
+                    <DateRangePicker @bind-StartDate="newPersonalSchedule.StartDate" @bind-EndDate="newPersonalSchedule.EndDate" />
+                    <br />
+                    <label>설명:</label>
+                    <br />
+                    <textarea @bind="newPersonalSchedule.TaskDetails" rows="5" cols="35" placeholder="Detail..." style="resize:none;"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @onclick="AddScheduleButton">Add</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseAddScheduleDialogButton">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
+
 @code {
 
     AuthenticationState authState;
@@ -44,7 +77,9 @@
 
     #region 일정 관련 변수들
     private List<Appointment> _appointments = new();
+    private bool isShowAddScheduleDialog = false;
 
+    private PersonalSchedule newPersonalSchedule = new();
     #endregion
 
     protected override async Task OnInitializedAsync()
@@ -62,17 +97,20 @@
 
         thisUser = await UserRepository.GetUserByIdAsync(user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
 
-        await LoadUserWorkspacesWorks();
+        await LoadSchedules();
     }
 
-    private async Task LoadUserWorkspacesWorks()
+    private async Task LoadSchedules()
     {
+        _appointments.Clear();
+
         // Workspace에서 할당된 작업들 로드
         List<UserWork> userWorks = await UserWorkRepository.GetUserWorkByUserIdAsync(thisUser.Id);
+        List<PersonalSchedule> personalSchedules = await PersonalScheduleRepository.GetPersonalScheduleByUserId(thisUser.Id);
 
         string[] colors = { "aqua", "fuchsia", "green", "yellow", "red", "silver" };
-        int i = 0;
 
+        int i = 0;
         foreach (UserWork userWork in userWorks)
         {
             if (!userWork.Work.IsDeleted)
@@ -89,6 +127,44 @@
             }
             ++i;
         }
+        i = 0;
+        foreach (PersonalSchedule s in personalSchedules)
+        {
+            if (!s.IsDeleted)
+            {
+                MyAppointment app = new()
+                    {
+                        Start = s.StartDate.Value.UtcDateTime,
+                        End = s.EndDate.Value.UtcDateTime,
+                        Class = s.Name,
+                        Color = colors[i % colors.Length],
+                        IsWorkspaceWork = true
+                    };
+                _appointments.Add(app);
+            }
+            ++i;
+        }
     }
 
+    #region 일정 관련 함수들
+    private void ShowAddScheduleDialogButton(MouseEventArgs e)
+    {
+        isShowAddScheduleDialog = true;
+    }
+    private async Task AddScheduleButton(MouseEventArgs e)
+    {
+        newPersonalSchedule.UserId = thisUser.Id;
+        newPersonalSchedule.IsSuccess = false;
+        await PersonalScheduleRepository.AddPersonalScheduleAsync(newPersonalSchedule, thisUser.Id);
+
+        isShowAddScheduleDialog = false;
+        newPersonalSchedule = new();
+
+        await LoadSchedules();
+    }
+    private void CloseAddScheduleDialogButton(MouseEventArgs e)
+    {
+        isShowAddScheduleDialog = false;
+    }
+    #endregion
 }

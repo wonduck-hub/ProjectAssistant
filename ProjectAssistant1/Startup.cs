@@ -32,6 +32,7 @@ using ProjectAssistant1.Models.Models.ChatModel;
 using System.Text.Json.Serialization;
 using ProjectAssistant1.Models.Models.VotModel;
 using ProjectAssistant1.Models.Models.VotesModel;
+using ProjectAssistant1.Models.Models.PersonalScheduleModel;
 
 namespace ProjectAssistant1
 {
@@ -87,6 +88,7 @@ namespace ProjectAssistant1
             services.AddTransient<IChatRepository, ChatRepository>();
             services.AddTransient<IVotRepository, VotRepository>();
             services.AddTransient<IVotesRepository, VotesRepository>();
+            services.AddTransient<IPersonalScheduleRepository, PersonalScheduleRepository>();
 
             // SignalR and Response Compression
             services.AddSignalR();

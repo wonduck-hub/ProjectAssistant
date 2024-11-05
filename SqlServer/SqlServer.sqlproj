@@ -167,6 +167,6 @@
     <Build Include="dbo\Tables\ChatRooms.sql" />
     <Build Include="dbo\Tables\Vots.sql" />
     <Build Include="dbo\Tables\Votes.sql" />
-    <Build Include="dbo\Tables\PersonalSchedule.sql" />
+    <Build Include="dbo\Tables\PersonalSchedules.sql" />
   </ItemGroup>
 </Project>

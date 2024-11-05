@@ -4,8 +4,10 @@ using ProjectAssistant1.Models.Models.WorkspaceUserModel;
 using ProjectAssistant1.Models.Models.UserWorkModel;
 using ProjectAssistant1.Models.Models.ChatModel;
 using System.Text.Json.Serialization;
+using ProjectAssistant1.Models.Models.PersonalScheduleModel;
 
-namespace ProjectAssistant1.Models.UserModel { 
+namespace ProjectAssistant1.Models.UserModel
+{
     public class User
     {
         public string Id { get; set; }
@@ -33,5 +35,7 @@ namespace ProjectAssistant1.Models.UserModel {
         virtual public IEnumerable<UserWork> UserWorks { get; set; }
         [JsonIgnore]
         virtual public IEnumerable<Chat> Chats { get; set; }
+        [JsonIgnore]
+        virtual public IEnumerable<PersonalSchedule> PersonalSchedules { get; set; }
     }
 }
