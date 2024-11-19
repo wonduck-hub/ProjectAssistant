@@ -3,10 +3,10 @@
 <MudDialog>
     <DialogContent>
         <MudList Dense="true">
-        @foreach (var app in Appointments.Where(x => x.Start.Date <= SelectedDate && x.End.Date >= SelectedDate))
+        @foreach (var app in Appointments.Where(x => x.Start.Value.DateTime <= SelectedDate && x.End.Value.DateTime >= SelectedDate))
         {
             <MudListItem>
-                @app.Title
+                @app.ScheduleDetail
                     <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small" @onclick="() => Appointments.Remove(app)"></MudIconButton>
             </MudListItem>
         }

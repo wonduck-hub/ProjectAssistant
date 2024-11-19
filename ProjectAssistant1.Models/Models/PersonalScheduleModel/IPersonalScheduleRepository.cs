@@ -14,7 +14,7 @@ namespace ProjectAssistant1.Models.Models.PersonalScheduleModel
         Task<List<PersonalSchedule>> GetPersonalSchedulesAsync();
         Task<PersonalSchedule> GetPersonalScheduleByIdAsync(int id);
         Task<List<PersonalSchedule>> GetPersonalScheduleByUserId(string userId);
-        Task<PersonalSchedule> UpdatePersonalScheduleAsync(PersonalSchedule s);
+        Task UpdatePersonalScheduleAsync(PersonalSchedule s);
         Task DeletePersonalScheduleById(int id);
     }
 }

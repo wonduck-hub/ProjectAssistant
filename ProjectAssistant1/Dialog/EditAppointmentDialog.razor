@@ -3,11 +3,11 @@
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.CalendarToday" Class="mr-3"/> @Appointment.Title
+            <MudIcon Icon="@Icons.Material.Filled.CalendarToday" Class="mr-3"/> @Appointment.ScheduleDetail
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Label="Title" @bind-Text="Appointment.Title" />
+        <MudTextField T="string" Label="Title" @bind-Text="Appointment.ScheduleDetail" />
         <MudDateRangePicker Label="When" @bind-DateRange="_dateRange" />
         <MudColorPicker Label="Color" @bind-Text="Appointment.Color" Style="@($"color: {Appointment.Color};")" />
     </DialogContent>
@@ -37,7 +37,7 @@
 
     protected override void OnParametersSet()
     {
-        __dateRange = new DateRange(Appointment.Start, Appointment.End);
+        __dateRange = new DateRange(Appointment.Start.Value.DateTime, Appointment.End.Value.DateTime);
         base.OnParametersSet();
     }
 

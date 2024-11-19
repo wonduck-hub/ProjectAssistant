@@ -10,9 +10,10 @@ namespace ProjectAssistant1.AppointmentClass
 {
     public class MyAppointment
     {
-        public string Title { get; set; }
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
+        public int ScheduleId { get; set; }
+        public string ScheduleDetail { get; set; }
+        public DateTimeOffset? Start { get; set; }
+        public DateTimeOffset? End { get; set; }
         public string Color { get; set; }
         public string? Class { get; set; }
         public bool IsWorkspaceWork { get; set; }

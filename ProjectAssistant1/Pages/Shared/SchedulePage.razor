@@ -32,7 +32,7 @@
     <Appointments>
         @foreach (var app in _appointments)
         {
-            <Appointment Start="@app.Start" End="@app.End" Color="@app.Color" OnClick="() => ShowScheduleDetail(app)">
+            <Appointment Start="@app.Start.Value.DateTime" End="@app.End.Value.DateTime" Color="@app.Color" OnClick="() => ShowScheduleDetail(app)">
                 @app.Class
             </Appointment>
         }
@@ -78,19 +78,22 @@
                 </div>
                 <div class="modal-body">
                     <label>작업 이름:</label>
-                    <input type="text"/>
+                    <input type="text" @bind="selectedAppointment.Class"/>
                     <br />
                     <label>기간:</label>
-                    <DateRangePicker/>
+                    <DateRangePicker @bind-StartDate="@selectedAppointment.Start" @bind-EndDate="@selectedAppointment.End" />
                     <br />
                     <label>설명:</label>
                     <br />
-                    <textarea rows="5" cols="35" placeholder="Detail..." style="resize:none;"></textarea>
+                    <textarea rows="5" cols="35" placeholder="Detail..." style="resize:none;" @bind="selectedAppointment.ScheduleDetail"></textarea>
                     <br />
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" @onclick="UpdateScheduleDialogButton">Save</button>
-                    <button type="button" class="btn btn-danger" @onclick="DeleteScheculeDialogButton">Delete</button>
+                    @if (!selectedAppointment.IsWorkspaceWork)
+                    {
+                        <button type="button" class="btn btn-success" @onclick="UpdateScheduleDialogButton">Save</button>
+                        <button type="button" class="btn btn-danger" @onclick="DeleteScheculeDialogButton">Delete</button>
+                    }
                     <button type="button" class="btn btn-secondary" @onclick="CloseScheduleDetailDialogButton">Close</button>
                 </div>
             </div>
@@ -106,6 +109,8 @@
 
     #region 변수들
     private User thisUser;
+    List<UserWork> userWorks;
+    List<PersonalSchedule> personalSchedules;
     #endregion
 
     #region 일정 관련 변수들
@@ -115,6 +120,8 @@
     private PersonalSchedule newPersonalSchedule = new();
 
     private bool isShowScheduleDetail = false;
+
+    private MyAppointment selectedAppointment;
     #endregion
 
     protected override async Task OnInitializedAsync()
@@ -140,8 +147,8 @@
         _appointments.Clear();
 
         // Workspace에서 할당된 작업들 로드
-        List<UserWork> userWorks = await UserWorkRepository.GetUserWorkByUserIdAsync(thisUser.Id);
-        List<PersonalSchedule> personalSchedules = await PersonalScheduleRepository.GetPersonalScheduleByUserId(thisUser.Id);
+        userWorks = await UserWorkRepository.GetUserWorkByUserIdAsync(thisUser.Id);
+        personalSchedules = await PersonalScheduleRepository.GetPersonalScheduleByUserId(thisUser.Id);
 
         string[] colors = { "aqua", "fuchsia", "green", "yellow", "red", "silver" };
 
@@ -152,8 +159,10 @@
             {
                 MyAppointment app = new()
                     {
-                        Start = userWork.Work.StartDate.Value.UtcDateTime,
+                        ScheduleId = userWork.Work.Id,
+                        Start = userWork.Work.StartDate.Value.UtcDateTime.AddDays(1),
                         End = userWork.Work.EndDate.Value.UtcDateTime,
+                        ScheduleDetail = userWork.Work.TaskDetails,
                         Class = userWork.Work.Name,
                         Color = colors[i % colors.Length],
                         IsWorkspaceWork = true
@@ -169,8 +178,10 @@
             {
                 MyAppointment app = new()
                     {
-                        Start = s.StartDate.Value.UtcDateTime,
+                        ScheduleId = s.Id,
+                        Start = s.StartDate.Value.UtcDateTime.AddDays(1),
                         End = s.EndDate.Value.UtcDateTime,
+                        ScheduleDetail = s.TaskDetails,
                         Class = s.Name,
                         Color = colors[i % colors.Length],
                         IsWorkspaceWork = false
@@ -181,7 +192,7 @@
         }
     }
 
-    #region 일정 관련 함수들
+    #region 일정 관리 함수들
     private void ShowAddScheduleDialogButton(MouseEventArgs e)
     {
         isShowAddScheduleDialog = true;
@@ -204,13 +215,29 @@
         isShowAddScheduleDialog = false;
     }
 
-    async Task ShowScheduleDetail(MyAppointment p)
+    private PersonalSchedule FindScheduleByIdOrNull(int id)
     {
-        var dialog = DialogService.Show<EditAppointmentDialog>("Edit Appointment", new DialogParameters
+        foreach (var s in personalSchedules)
+        {
+            if (s.Id == id)
             {
-                ["Appointment"] = p,
-            });
-        await dialog.Result;
+                return s;
+            }
+        }
+
+        return null;
+    }
+
+    private async Task ShowScheduleDetail(MyAppointment p)
+    {
+        selectedAppointment = p;
+
+        isShowScheduleDetail = true;
+        // var dialog = DialogService.Show<EditAppointmentDialog>("Edit Appointment", new DialogParameters
+        //     {
+        //         ["Appointment"] = p,
+        //     });
+        // await dialog.Result;
 
         StateHasChanged();
     }
@@ -220,15 +247,27 @@
         isShowScheduleDetail = false;
     }
 
-    private void DeleteScheculeDialogButton(MouseEventArgs e)
+    private async Task DeleteScheculeDialogButton(MouseEventArgs e)
     {
+        await PersonalScheduleRepository.DeletePersonalScheduleById(selectedAppointment.ScheduleId);
+        await LoadSchedules();
+
         isShowScheduleDetail = false;
     }
 
-    private void UpdateScheduleDialogButton(MouseEventArgs e)
+    private async Task UpdateScheduleDialogButton(MouseEventArgs e)
     {
+        PersonalSchedule s = FindScheduleByIdOrNull(selectedAppointment.ScheduleId);
+        s.Name = selectedAppointment.Class;
+        s.StartDate = selectedAppointment.Start.Value.AddDays(-1);
+        s.EndDate = selectedAppointment.End;
+        s.TaskDetails = selectedAppointment.ScheduleDetail;
+
+        await PersonalScheduleRepository.UpdatePersonalScheduleAsync(s);
+        await LoadSchedules();
+        
         isShowScheduleDetail = false;
     }
     #endregion
-    
+
 }

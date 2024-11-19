@@ -27,9 +27,15 @@ namespace ProjectAssistant1.Models.Models.PersonalScheduleModel
             return s;
         }
 
-        public Task DeletePersonalScheduleById(int id)
+        public async Task DeletePersonalScheduleById(int id)
         {
-            throw new NotImplementedException();
+            Debug.Assert(id >= 0, "PersonalSchedule id is 0");
+            PersonalSchedule temp = await _context.PersonalSchedules.FindAsync(id);
+            if (temp != null) {
+                temp.IsDeleted = true;
+                _context.Entry(temp).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<List<PersonalSchedule>> GetPersonalScheduleByUserId(string userId)
@@ -49,9 +55,10 @@ namespace ProjectAssistant1.Models.Models.PersonalScheduleModel
             throw new NotImplementedException();
         }
 
-        public Task<PersonalSchedule> UpdatePersonalScheduleAsync(PersonalSchedule s)
+        public async Task UpdatePersonalScheduleAsync(PersonalSchedule s)
         {
-            throw new NotImplementedException();
+            _context.Entry(s).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -94,21 +94,6 @@ namespace ProjectAssistant1
             services.AddTransient<IVotesRepository, VotesRepository>();
             services.AddTransient<IPersonalScheduleRepository, PersonalScheduleRepository>();
 
-            services.AddScoped<IWorkspaceRepositoryAsync, WorkspaceRepository>();
-            services.AddScoped<IUserWorkspaceRepositoryAsync, UserWorkspaceRepository>();
-            services.AddScoped<IUserRepositoryAsync, UserRepository>();
-            services.AddScoped<IWorkspaceUserRepository, WorkspaceUserRepository>();
-            services.AddScoped<IWorkRepository, WorkRepository>();
-            services.AddScoped<IListWorkspaceRepository, ListWorkspaceRepository>();
-            services.AddScoped<IUserWorkRepository, UserWorkRepository>();
-            services.AddScoped<IWorkListRepository, WorkListRepository>();
-            services.AddScoped<IWorkspaceWorkRepository, WorkspaceWorkRepository>();
-            services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
-            services.AddScoped<IChatRepository, ChatRepository>();
-            services.AddScoped<IVotRepository, VotRepository>();
-            services.AddScoped<IVotesRepository, VotesRepository>();
-            services.AddScoped<IPersonalScheduleRepository, PersonalScheduleRepository>();
-
             // SignalR and Response Compression
             services.AddSignalR();
             services.AddResponseCompression(opts =>
