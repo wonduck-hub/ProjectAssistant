@@ -9,10 +9,8 @@ slack, trello와 같은 협업에 필요한 도구를 하나의 서비스로 제
 - Visual Studio
 
 ### 데모
-<video width="320" height="240" controls>
-    <source src="Videos/Demo.mp4" type="video/mp4">
-    브라우저가 비디오 태그를 지원하지 않습니다.
-</video>
+[데모 비디오 보기](https://youtu.be/7Yz9n0Z7nIg)
+
 
 ### 이미지
 ![메인 화면](Images/mainPage.png)
